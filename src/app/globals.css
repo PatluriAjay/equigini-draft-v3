@@ -1,27 +1,243 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  @apply bg-white text-gray-900 font-primary ;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+/* Titles */
+.title-main {
+  @apply text-5xl font-bold text-primarycolor mb-4 font-primary;
+}
+.title-page {
+  @apply text-4xl font-bold text-primarycolor mb-3 font-primary;
+}
+
+/* Page Headings */
+.heading-main {
+  @apply text-base sm:text-base md:text-base font-semibold font-primary mb-3;
+}
+.heading-section {
+  @apply text-sm font-semibold text-secondary mb-2 font-primary;
+}
+
+/* Sub Headings */
+.subheading {
+  @apply text-sm font-medium text-gray-700 mb-1 font-primary;
+}
+
+/* Card Headings */
+.card-heading {
+  @apply text-base font-semibold text-primarycolor mb-2 font-primary;
+}
+
+.card-heading-secondary {
+  @apply text-sm text-secondary mb-2 font-primary font-semibold ;
+}
+
+/* Paragraphs */
+.p-large {
+  @apply text-sm text-secondary3 font-primary mb-2;
+}
+.p-medium {
+  @apply text-sm text-secondary3 font-primary mb-2;
+}
+.p-small {
+  @apply text-sm text-secondary3 font-primary mb-2;
+}
+
+/* Buttons */
+.btn-primary {
+  @apply px-3 py-2 rounded-lg bg-secondary text-white font-semibold shadow hover:scale-105 transition-transform text-sm;
+}
+.btn-secondary {
+  @apply px-3 py-2 rounded-lg bg-[#ededed] text-black font-semibold shadow hover:scale-105 transition-transform text-sm;
+}
+
+.btn-tertiary {
+  @apply px-3 py-2 rounded-lg bg-secondary text-white font-semibold shadow hover:scale-105 transition-transform text-sm;
+}
+
+.btn-delete {
+  @apply px-4 py-1 rounded bg-red-600 text-white font-medium hover:bg-red-700 transition;
+}
+
+/* Utility for disabled button */
+.btn-disabled {
+  @apply opacity-50 cursor-not-allowed;
+}
+
+/* More utility classes as needed */
+.card {
+  @apply bg-white rounded-lg shadow-card p-6;
+}
+.card-bordered {
+  @apply border border-bordercolor rounded-lg p-6;
+}
+
+/* Utility for bold font */
+.font-bold-custom {
+  @apply font-bold;
+}
+
+.sidebar-gradient {
+  background: linear-gradient(to right, #a330ae, #a330ae90);
+}
+
+/* Form Elements */
+.form-label {
+  @apply block  mb-1 font-primary text-sm;
+}
+.form-input {
+  @apply w-full border border-bordercolor rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primarycolor/20 focus:border-primarycolor bg-white text-gray-900 text-sm font-primary transition-all duration-200;
+}
+
+.form-select {
+  @apply w-full border border-bordercolor rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primarycolor/20 focus:border-primarycolor bg-white text-gray-900 text-sm font-primary transition-all duration-200;
+}
+
+/* React Select Customization */
+.react-select-container {
+  @apply w-full;
+}
+
+.react-select__control {
+  @apply !bg-white !border-bordercolor !rounded-lg !min-h-[44px] !shadow-none hover:!border-primarycolor/50 transition-all duration-200;
+}
+
+.react-select__control--is-focused {
+  @apply !border-primarycolor !ring-2 !ring-primarycolor/20 !shadow-none;
+}
+
+.react-select__menu {
+  @apply !bg-white !border !border-bordercolor !rounded-lg !shadow-lg !mt-1 !z-50;
+}
+
+.react-select__option {
+  @apply !text-gray-900 !text-sm !py-2 !px-4 !cursor-pointer hover:!bg-primarycolor/5 transition-colors duration-200;
+}
+
+.react-select__option--is-focused {
+  @apply !bg-primarycolor/10;
+}
+
+.react-select__option--is-selected {
+  @apply !bg-primarycolor/20 !text-primarycolor !font-medium;
+}
+
+.react-select__single-value {
+  @apply !text-gray-900 !text-sm;
+}
+
+.react-select__placeholder {
+  @apply !text-gray-400 !text-sm;
+}
+
+.react-select__indicator-separator {
+  @apply !bg-bordercolor;
+}
+
+.react-select__dropdown-indicator {
+  @apply !text-gray-400 hover:!text-primarycolor transition-colors duration-200;
+}
+
+/* File Upload Styles */
+.file-upload-container {
+  @apply flex items-center gap-2 border border-bordercolor rounded-lg px-4 py-3 transition-all duration-200 hover:border-primarycolor/50;
+}
+
+.file-upload-input {
+  @apply hidden;
+}
+
+.search-input {
+  @apply w-full border-b-2 border-bordercolor  py-2 focus:outline-none focus:border-primarycolor2 bg-white text-gray-900 text-sm font-primary transition;
+}
+
+.form-select {
+  @apply w-full border border-bordercolor rounded-lg px-4 py-2 focus:outline-none focus:ring-1 focus:ring-primarycolor2 focus:border-primarycolor2 bg-white text-gray-900 text-sm font-primary transition;
+}
+
+.badge {
+  @apply inline-block px-3 py-1 rounded-full text-xs font-medium align-middle;
+}
+
+.table-main {
+  @apply min-w-full divide-y divide-gray-100 text-sm;
+}
+.table-row:hover{
+  @apply bg-white;
+}
+.table-header-row {
+  @apply bg-gray-50;
+}
+.table-th {
+  @apply px-4 py-3 text-left font-semibold text-secondary text-xs;
+}
+.table-row {
+  @apply hover:bg-gray-50 transition;
+}
+.table-td {
+  @apply px-4 py-3 align-middle;
+}
+.table-empty {
+  @apply text-center py-8 text-secondary3;
+}
+
+.btn-inline {
+  @apply flex items-center gap-1 whitespace-nowrap;
+}
+
+/* Navbar Animations */
+.navbar-links {
+  @apply transition-all duration-500 ease-in-out;
+}
+.navbar-links-hide {
+  @apply opacity-0 translate-y-4 pointer-events-none;
+}
+.navbar-links-show {
+  @apply opacity-100 translate-y-0;
+}
+.navbar-search {
+  @apply transition-all duration-500 ease-in-out;
+}
+.navbar-search-hide {
+  @apply opacity-0 translate-y-4 pointer-events-none;
+}
+.navbar-search-show {
+  @apply opacity-100 translate-y-0;
+}
+
+/* Navbar Horizontal Slide Animations */
+.navbar-links-slide-out {
+  @apply opacity-0 translate-x-32 pointer-events-none;
+}
+.navbar-links-slide-in {
+  @apply opacity-100 translate-x-0;
+}
+.navbar-search-slide-out {
+  @apply opacity-0 -translate-x-32 pointer-events-none;
+}
+.navbar-search-slide-in {
+  @apply opacity-100 translate-x-0;
+}
+
+.btn-icon {
+  @apply p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center;
+}
+
+.btn-outline {
+  @apply px-3 py-2 rounded-lg border border-primarycolor text-primarycolor bg-white font-semibold shadow hover:bg-primarycolor hover:text-white transition-transform text-sm;
+}
+
+.btn-icon-only {
+  @apply p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primarycolor;
 }
