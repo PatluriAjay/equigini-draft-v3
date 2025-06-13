@@ -25,7 +25,7 @@ export default function InvestorDealsPage() {
   // Placeholder watchlist
   const watchlist = [
     { id: 2, title: 'GreenEnergy Ventures', stage: 'Growth', sector: 'CleanTech', ticketSize: '₹1Cr - ₹10Cr' },
-    { id: 4, title: 'EdTech Innovators', stage: 'Early Stage', sector: 'EdTech', ticketSize: '₹10L - ₹1Cr' },
+    { id: 4, title: 'EdTech Innovators', stage: 'Early', sector: 'EdTech', ticketSize: '₹10L - ₹1Cr' },
     { id: 5, title: 'LogiTech Systems', stage: 'Growth', sector: 'Logistics', ticketSize: '₹75L - ₹7Cr' },
   ];
 
@@ -35,7 +35,7 @@ export default function InvestorDealsPage() {
       id: 1,
       slug: 'techflow-ai',
       title: 'TechFlow AI',
-      stage: 'Series A',
+      stage: 'Early',
       sector: 'FinTech',
       status: 'Closing Soon',
       summary: 'AI-powered financial analytics platform revolutionizing investment decision-making for institutional investors across emerging markets.',
@@ -61,7 +61,7 @@ export default function InvestorDealsPage() {
       id: 3,
       slug: 'healthtech-solutions',
       title: 'HealthTech Solutions',
-      stage: 'Series B',
+      stage: 'Debt',
       sector: 'HealthTech',
       status: 'Open',
       summary: 'Digital health platform connecting patients with healthcare providers through innovative telemedicine solutions.',
@@ -74,7 +74,7 @@ export default function InvestorDealsPage() {
       id: 4,
       slug: 'edtech-innovators',
       title: 'EdTech Innovators',
-      stage: 'Early Stage',
+      stage: 'Early',
       sector: 'EdTech',
       status: 'Open',
       summary: 'Revolutionary educational technology platform making quality education accessible through AI-driven personalized learning.',
@@ -87,7 +87,7 @@ export default function InvestorDealsPage() {
       id: 5,
       slug: 'logitech-systems',
       title: 'LogiTech Systems',
-      stage: 'Growth',
+      stage: 'Pre-IPO',
       sector: 'Logistics',
       status: 'Closing Soon',
       summary: 'Next-generation logistics optimization platform using AI to streamline supply chain operations and reduce costs.',
@@ -100,7 +100,7 @@ export default function InvestorDealsPage() {
       id: 6,
       slug: 'cybershield',
       title: 'CyberShield',
-      stage: 'Series A',
+      stage: 'Early',
       sector: 'CyberSecurity',
       status: 'Open',
       summary: 'Advanced cybersecurity solutions provider protecting enterprises from emerging digital threats with AI-powered defense systems.',
@@ -142,7 +142,6 @@ export default function InvestorDealsPage() {
       />
       {/* <WatchlistBar watchlist={watchlist} onViewAll={handleViewAllWatchlist} /> */}
       <div>
-        <div className="heading-section mb-2">All Investment Opportunities</div>
         <DealsGrid deals={filteredDeals} onVerify={handleVerify} onView={handleView} />
       </div>
     </div>

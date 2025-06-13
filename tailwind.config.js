@@ -60,6 +60,7 @@ module.exports = {
         primary: "0px 4px 6px rgba(0, 0, 0, 0.1)",
         secondary: "0px 2px 4px rgba(0, 0, 0, 0.05)",
         card: "0px 10px 20px rgba(0, 0, 0, 0.1)",
+       
       },
       keyframes: {},
 

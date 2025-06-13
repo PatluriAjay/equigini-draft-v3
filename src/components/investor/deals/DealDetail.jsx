@@ -1,23 +1,28 @@
 import React, { useEffect, useState } from "react";
 import Button from "../../admin/deals/Button";
-// TODO: Import subcomponents for each section (Overview, Executive Summary, Documents, etc.)
+import { FaRegEye, FaDownload } from 'react-icons/fa';
+import { MdFileDownload } from 'react-icons/md';
 
 export default function DealDetail({ dealSlug }) {
-  // Integration-ready: fetch deal data using dealSlug
   const [deal, setDeal] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("Executive Summary");
+
+  const tabSections = [
+    { label: "Executive Summary", key: "Executive Summary" },
+    { label: "Investment Thesis", key: "Investment Thesis" },
+    { label: "Sector Overview", key: "Sector Overview" },
+    { label: "Deal Structure & Ticket Size", key: "Deal Structure & Ticket Size" },
+    { label: "Deal Documents", key: "Deal Documents" },
+  ];
 
   useEffect(() => {
-    // TODO: Replace with real API call
-    setLoading(true);
     setTimeout(() => {
       setDeal({
         slug: dealSlug,
         title: "TechFlow AI",
         status: "Open",
         sector: "Fintech",
-        stage: "Series A",
+        stage: "Growth",
         location: "Mumbai, India",
         irr: "25-30% IRR",
         summary: "AI-powered financial analytics platform revolutionizing investment decision-making for institutional investors across emerging markets with proven revenue model and strong market traction.",
@@ -34,92 +39,106 @@ export default function DealDetail({ dealSlug }) {
         sectorOverview: "Fintech",
         structure: "Deal structure and ticket size content goes here...",
       });
-      setLoading(false);
     }, 500);
   }, [dealSlug]);
-
-  // if (loading) return <div className="p-8 text-center p-large">Loading...</div>;
-  if (error) return <div className="p-8 text-center text-red-600 p-large">{error}</div>;
   if (!deal) return null;
 
   return (
     <div className="relative min-h-screen pb-20">
       <div className="mx-auto ">
-        {/* Header */}
+        {/* Header - always visible */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
             <h1 className="heading-main mb-1">{deal.title}</h1>
-            <div className="flex flex-wrap gap-2 mb-2">
-              <span className="badge bg-green-100 text-green-800">{deal.status}</span>
-              <span className="badge bg-blue-100 text-blue-800">{deal.sector}</span>
-              {/* <span className="badge bg-gray-100 text-gray-700">{deal.stage}</span> */}
-              <span className="badge bg-gray-100 text-gray-700">{deal.location}</span>
-              <span className="badge bg-purple-100 text-purple-800">{deal.irr}</span>
+            <div className="flex flex-wrap gap-2 mb-2 flex-col">
+              <p className="text-sm text-secondary3"><span className="font-bold-custom">Status:</span> {deal.status}</p>
+              <p className="text-sm text-secondary3 "><span className="font-bold-custom">Sector:</span> {deal.sector}</p>
+              <p className="text-sm text-secondary3 "><span className="font-bold-custom">Stage:</span> {deal.stage}</p>
+              <p className="text-sm text-secondary3 "><span className="font-bold-custom">Location:</span> {deal.location}</p>
+              <p className="text-sm text-secondary3"><span className="font-bold-custom">Expected IRR:</span> {deal.irr}</p>
             </div>
-            <p className="p-large max-w-2xl">{deal.summary}</p>
-          </div>
-          <div className="flex flex-col gap-2 items-end">
-            {/* {deal.ndaSigned && (
-              <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg px-4 py-2 text-xs font-medium mb-2">NDA Signed<br />You have access to all deal documents and detailed information.</div>
-            )} */}
-            <Button as="a" href={deal.documents[0].url} variant="primary" download>Download Overview</Button>
-          </div>
-        </div>
-
-        {/* Deal Overview Document */}
-        <div className="mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div>
-              <div className="card-heading-secondary">Deal Overview Document</div>
-              <div className="p-medium text-gray-700">{deal.documents[0].name} <span className="text-xs text-gray-400">({deal.documents[0].size})</span></div>
-            </div>
-            <Button as="a" href={deal.documents[0].url} variant="primary" download>Download</Button>
-          </div>
-        </div>
-
-        {/* Executive Summary */}
-        <div className="mb-4">
-          <div className="card-heading-secondary">Executive Summary</div>
-          <p className="p-medium whitespace-pre-line">{deal.executiveSummary}</p>
-        </div>
-
-        {/* Investment Thesis */}
-        <div className="mb-4">
-          <div className="card-heading-secondary">Investment Thesis</div>
-          <p className="p-medium whitespace-pre-line">{deal.thesis}</p>
-        </div>
-
-        {/* Sector Overview */}
-        <div className="mb-4">
-          <div className="card-heading-secondary">Sector Overview</div>
-          <p className="p-medium whitespace-pre-line">{deal.sectorOverview}</p>
-        </div>
-
-        {/* Deal Structure & Ticket Size */}
-        <div className="mb-4">
-          <div className="card-heading-secondary">Deal Structure & Ticket Size</div>
-          <p className="p-medium whitespace-pre-line">{deal.structure}</p>
-        </div>
-
-        {/* Deal Documents */}
-        <div className="mb-4">
-          <div className="card-heading-secondary mb-2">Deal Documents</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {deal.documents.slice(1).map((doc, idx) => (
-              <div key={doc.name} className="flex items-center justify-between border border-bordercolor rounded-lg px-4 py-3 bg-white">
-                <div>
-                  <div className="font-medium text-sm text-primarycolor mb-1">{doc.name}</div>
-                  <div className="text-xs text-gray-400 mb-1">{doc.size}</div>
-                  <div className="badge bg-gray-100 text-gray-700 capitalize text-xs">{doc.type.replace("_", " ")}</div>
-                </div>
+            <p className="p-large ">{deal.summary}</p>
+            {/* Teaser Document */}
+            {deal.documents && deal.documents.length > 0 && (
+              <div className="flex items-center gap-3 mt-3">
+                <p className="text-xs text-secondary3 font-bold-custom">Teaser Document:</p>
+                <p className="text-xs font-medium">{deal.documents[0].name} <span className="text-gray-400">({deal.documents[0].size})</span></p>
                 <div className="flex gap-2">
-                  <Button as="a" href={doc.url} variant="secondary" download>Download</Button>
-                  <Button as="a" href={doc.url} variant="primary" target="_blank" rel="noopener noreferrer">View</Button>
+                  <button className="p-2 rounded-full"><FaRegEye className="w-5 h-5 text-black" /></button>
+                  <button className="p-2 rounded-full"><MdFileDownload className="w-5 h-5 text-black" /></button>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
+        {/* Tabs */}
+        <div className="border-b border-gray-200 mb-6 flex flex-wrap gap-2">
+          {tabSections.map(tab => (
+            <button
+              key={tab.key}
+              className={`px-4 py-2 font-medium text-sm border-b-2 transition-all duration-150 ${activeTab === tab.key ? 'border-primarycolor text-primarycolor' : 'border-transparent text-secondary3 hover:text-primarycolor'}`}
+              onClick={() => setActiveTab(tab.key)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        {/* Tab Content */}
+        {activeTab === "Executive Summary" && (
+          <div className="mb-4">
+            <div className="card-heading-secondary">Executive Summary</div>
+            <p className="p-medium whitespace-pre-line">{deal.executiveSummary}</p>
+          </div>
+        )}
+        {activeTab === "Deal Overview Document" && (
+          <div className="mb-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <div className="card-heading-secondary">Deal Overview Document</div>
+                <div className="p-medium text-gray-700">{deal.documents[0].name} <span className="text-xs text-gray-400">({deal.documents[0].size})</span></div>
+              </div>
+              <Button as="a" href={deal.documents[0].url} variant="primary" download>Download</Button>
+            </div>
+          </div>
+        )}
+        {activeTab === "Investment Thesis" && (
+          <div className="mb-4">
+            <div className="card-heading-secondary">Investment Thesis</div>
+            <p className="p-medium whitespace-pre-line">{deal.thesis}</p>
+          </div>
+        )}
+        {activeTab === "Sector Overview" && (
+          <div className="mb-4">
+            <div className="card-heading-secondary">Sector Overview</div>
+            <p className="p-medium whitespace-pre-line">{deal.sectorOverview}</p>
+          </div>
+        )}
+        {activeTab === "Deal Structure & Ticket Size" && (
+          <div className="mb-4">
+            <div className="card-heading-secondary">Deal Structure & Ticket Size</div>
+            <p className="p-medium whitespace-pre-line">{deal.structure}</p>
+          </div>
+        )}
+        {activeTab === "Deal Documents" && (
+          <div className="mb-4">
+            <div className="card-heading-secondary mb-2">Deal Documents</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {deal.documents.slice(1).map((doc, idx) => (
+                <div key={doc.name} className="flex items-center justify-between border border-bordercolor rounded-lg px-4 py-3 bg-white">
+                  <div>
+                    <div className="font-medium text-sm text-primarycolor mb-1">{doc.name}</div>
+                    <div className="text-xs text-gray-400 mb-1">{doc.size}</div>
+                    <div className="text-gray-700 capitalize text-sm ">{doc.type.replace("_", " ")}</div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button className="p-2 rounded-full"><FaRegEye className="w-5 h-5 text-black" /></button>
+                    <button className="p-2 rounded-full"><MdFileDownload className="w-5 h-5 text-black" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Sticky Bottom Bar */}
@@ -130,4 +149,4 @@ export default function DealDetail({ dealSlug }) {
       </div>
     </div>
   );
-} 
+}

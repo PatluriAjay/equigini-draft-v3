@@ -27,7 +27,6 @@ export default function ProfileStatus({ status = "Pending Review" }) {
 
   return (
     <div className="mb-8">
-      <div className="heading-section mb-4">Profile Status</div>
       <div className={`card-bordered p-6`}>
         <div className="flex items-start gap-4">
           <div className={`${config.color} text-3xl`}>

@@ -62,7 +62,7 @@ export default function UnverifiedInvestorDealsPage() {
       id: 1,
       slug: "techflow-ai",
       title: "TechFlow AI",
-      stage: "Series A",
+      stage: "Early",
       sector: "FinTech",
       status: "Closing Soon",
       summary:
@@ -88,7 +88,7 @@ export default function UnverifiedInvestorDealsPage() {
       id: 3,
       slug: "healthtech-solutions",
       title: "HealthTech Solutions",
-      stage: "Series B",
+      stage: "Debt",
       sector: "HealthTech",
       status: "Open",
       summary:
@@ -101,7 +101,7 @@ export default function UnverifiedInvestorDealsPage() {
       id: 4,
       slug: "edtech-innovators",
       title: "EdTech Innovators",
-      stage: "Early Stage",
+      stage: "Pre-IPO",
       sector: "EdTech",
       status: "Open",
       summary:
@@ -127,7 +127,7 @@ export default function UnverifiedInvestorDealsPage() {
       id: 6,
       slug: "cybershield",
       title: "CyberShield",
-      stage: "Series A",
+      stage: "Pre-IPO",
       sector: "CyberSecurity",
       status: "Open",
       summary:
@@ -177,9 +177,6 @@ export default function UnverifiedInvestorDealsPage() {
         />
         {/* <WatchlistBar watchlist={watchlist} onViewAll={handleViewAllWatchlist} /> */}
         <div>
-          <div className="heading-section mb-2">
-            All Investment Opportunities
-          </div>
           <DealsGrid
             deals={filteredDeals}
             onVerify={handleVerify}

@@ -27,6 +27,7 @@ export default function AdminSidebar({ collapsed, setCollapsed }) {
     { href: "/admin/eoi", label: "EOI", icon: FiFileText },
     { href: "/admin/crm", label: "CRM", icon: FiUsers },
     { href: "/admin/blogs", label: "Blogs", icon: FiBookOpen },
+    { href: "/admin/investor-approval", label: "Investor Approval", icon: FiUsers },
     // { href: "/admin/eoi-list", label: "EOI List", icon: FiFileText },
     { href: "/admin/document-access-logs", label: "Document Logs", icon: FiFile },
     { href: "/admin/profile", label: "Profile", icon: FiEdit },
@@ -35,7 +36,7 @@ export default function AdminSidebar({ collapsed, setCollapsed }) {
 
   return (
     <aside
-      className={`bg-white/60 backdrop-blur-xl shadow-lg rounded-2xl p-3 min-h-screen flex flex-col justify-between border border-white/30 transition-all duration-300 ${
+      className={`bg-white backdrop-blur-lg shadow-xl rounded-2xl p-3 min-h-screen flex flex-col justify-between border border-white transition-all duration-300 ${
         collapsed ? "w-16" : "w-60"
       }`}
     >
@@ -80,10 +81,10 @@ export default function AdminSidebar({ collapsed, setCollapsed }) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`group relative px-3 py-2 rounded-xl transition-all flex items-center gap-3
+                className={`group relative px-3 py-2 rounded-xl transition-all flex items-center gap-3 text-sm
                   ${
                     isActive || isHovered
-                      ? "text-white font-semibold sidebar-gradient text-base"
+                      ? "text-white sidebar-gradient text-base"
                       : "text-gray-700 border-l-0 font-normal"
                   }
                   ${collapsed ? "justify-center px-0" : ""}
@@ -124,9 +125,11 @@ export default function AdminSidebar({ collapsed, setCollapsed }) {
               <span className="text-xs text-gray-600 mb-2 text-center">
                 Initiative by <br /> <strong>Pantomath Group</strong>
               </span>
-              <button className="bg-primarycolor text-white rounded-lg px-4 py-1 text-xs">
-                Know More
-              </button>
+              <Link href="https://equigini.com" target="_blank" rel="noopener noreferrer">
+                <button className="bg-primarycolor text-white rounded-lg px-4 py-1 text-xs">
+                  Know More
+                </button>
+              </Link>
             </>
           )}
         </div>

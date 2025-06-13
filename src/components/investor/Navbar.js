@@ -53,7 +53,7 @@ export default function InvestorNavbar() {
   }, [searchOpen]);
 
   return (
-    <header className="w-full bg-white shadow-sm">
+    <header className="w-full flex items-center justify-center bg-white backdrop-blur-lg drop-shadow-[0_4px_6px_rgba(190,190,190,0.3)] border border-white rounded">
       <div className="container mx-auto px-6">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -78,9 +78,9 @@ export default function InvestorNavbar() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`transition-all duration-200 px-2 py-1 rounded font-medium text-base
-                    ${isActive ? "text-primarycolor scale-110" : "text-gray-500"}
-                    hover:text-primarycolor hover:scale-110
+                  className={`transition-all duration-200 px-2 py-1 rounded text-base
+                    ${isActive ? "text-primarycolor scale-95" : "text-gray-500"}
+                    hover:text-primarycolor hover:scale-95
                   `}
                   style={{
                     transition: "color 0.2s, transform 0.2s",
@@ -198,4 +198,4 @@ export default function InvestorNavbar() {
       </div>
     </header>
   );
-} 
+}

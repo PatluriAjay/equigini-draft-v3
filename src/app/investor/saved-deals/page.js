@@ -28,7 +28,7 @@ export default function SavedDealsPage() {
       id: 1,
       slug: "techflow-ai",
       title: "TechFlow AI",
-      stage: "Series A",
+      stage: "Early",
       sector: "FinTech",
       status: "Closing Soon",
       summary:
@@ -54,7 +54,7 @@ export default function SavedDealsPage() {
       id: 3,
       slug: "healthtech-solutions",
       title: "HealthTech Solutions",
-      stage: "Series B",
+      stage: "Debt",
       sector: "HealthTech",
       status: "Open",
       summary:

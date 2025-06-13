@@ -10,13 +10,6 @@ export default function InvestorFilters() {
         />
       </div>
       <div className="flex flex-row flex-nowrap gap-3 items-center  w-full sm:w-8/12">
-        {/* <select className="form-select min-w-[150px] w-auto">
-          <option>All Statuses</option>
-          <option>Verified</option>
-          <option>Pending Review</option>
-          <option>Unverified</option>
-          <option>Deactivated</option>
-        </select> */}
         <select className="form-select min-w-[150px] w-auto">
           <option>All Investor Types</option>
           <option>HNWI</option>

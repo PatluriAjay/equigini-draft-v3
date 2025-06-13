@@ -56,14 +56,14 @@ body {
 
 /* Buttons */
 .btn-primary {
-  @apply px-3 py-2 rounded-lg bg-secondary text-white font-semibold shadow hover:scale-105 transition-transform text-sm;
+  @apply px-3 py-2 rounded-lg bg-secondary text-white font-semibold shadow hover:scale-90 transition-transform text-sm;
 }
 .btn-secondary {
-  @apply px-3 py-2 rounded-lg bg-[#ededed] text-black font-semibold shadow hover:scale-105 transition-transform text-sm;
+  @apply px-3 py-2 rounded-lg bg-[#ededed] text-black font-semibold shadow hover:scale-90 transition-transform text-sm;
 }
 
 .btn-tertiary {
-  @apply px-3 py-2 rounded-lg bg-secondary text-white font-semibold shadow hover:scale-105 transition-transform text-sm;
+  @apply px-3 py-2 rounded-lg bg-secondary text-white font-semibold shadow hover:scale-90 transition-transform text-sm;
 }
 
 .btn-delete {

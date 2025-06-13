@@ -38,20 +38,19 @@ export default function OpportunitiesList({ opportunities: initialOpportunities,
             </div>
           </div>
           <div className="flex items-center gap-4 mt-3">
-            <button className="px-2 bg-[#A330AE] hover:bg-[#8d2899] text-white py-2 rounded-md font-semibold text-sm" onClick={() => router.push(`/investor/deals/${op.title}`)}>
+            <button className="w-full bg-[#A330AE] hover:bg-[#8d2899] text-white py-2 rounded-xl font-semibold text-sm" onClick={() => router.push(`/investor/deals/${op.title}`)}>
               View Details
             </button>
-             <button className="btn-primary flex-1 ">Download Teaser </button> 
-            {/* <button
+            <button
               className={`p-2 hover:bg-gray-100 rounded-full transition-colors ${op.bookmarked ? 'text-primarycolor' : 'text-secondary3'}`}
               onClick={() => onBookmark(op.id)}
               aria-label="Bookmark"
             >
               {op.bookmarked ? <FaBookmark size={18} /> : <FaRegBookmark size={18} />}
-            </button> */}
+            </button>
           </div>
           <div className="flex items-center justify-between">
-           
+            <button className="btn-primary flex-1 mt-2">Download Teaser Document</button>
           </div>
         </div>
       )) : (

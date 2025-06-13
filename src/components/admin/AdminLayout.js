@@ -24,14 +24,14 @@ export default function AdminLayout({ children }) {
         className={`flex-1 flex flex-col min-h-screen transition-all duration-300 ${mainPadding}`}
       >
         <div
-          className={`fixed top-0 z-20 right-0 transition-all duration-300 ${navbarLeft}`}
+          className={`fixed top-0 z-20 right-0 transition-all duration-300 ${navbarLeft} backdrop-blur-xl drop-shadow-[0_4px_6px_rgba(190,190,190,0.3)] border-b border-white rounded`}
         >
           <AdminNavbar />
         </div>
         <main
-          className={`flex-1 p-6 ${navbarPadding} min-h-screen bg-bodybg`}
+          className={`flex-1 p-6 ${navbarPadding} min-h-screen bg-bodybg `}
         >
-          {children}
+          <div className="pt-2">{children}</div>
         </main>
         {/* <AdminFooter /> */}
       </div>

@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 
 export default function InvestorDetailPage({ params }) {
   const searchParams = useSearchParams();
-  const source = searchParams.get("source") || "management"; // Default to management view
+  const source = searchParams.get("source") || "management"; 
 
   // Mock data for now
   const investor = {

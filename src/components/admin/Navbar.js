@@ -16,7 +16,7 @@ export default function AdminNavbar() {
     { href: "/admin/dashboard", label: "Dashboard" },
     { href: "/admin/investors", label: "Investors" },
     { href: "/admin/deals", label: "Deals" },
-    { href: "/admin/investor-approval", label: "Investor Approval Queue" },
+    // { href: "/admin/investor-approval", label: "Investor Approval Queue" },
     { href: "/admin/activity-monitor", label: "Activity Monitor" },
   ];
 
@@ -51,7 +51,8 @@ export default function AdminNavbar() {
   }, [searchOpen]);
 
   return (
-      <header className="w-full flex items-center justify-center rounded-2xl min-h-[56px] p-5 bg-white">
+     <header className="w-full flex items-center justify-center min-h-[56px] p-5 bg-white ">
+
         <div className="flex-1 flex items-center justify-center">
           {/* Empty for spacing */}
         </div>
@@ -67,12 +68,12 @@ export default function AdminNavbar() {
                   key={link.href}
                   href={link.href}
                   className={`transition-all duration-200 px-2 py-1 rounded font-medium text-base
-                    ${isActive ? "text-primarycolor scale-110" : "text-gray-500"}
-                    hover:text-primarycolor hover:scale-110 animate__animated animate__faster
+                    ${isActive ? "text-primarycolor scale-95" : "text-gray-500"}
+                    hover:text-primarycolor hover:scale-95 animate__animated animate__faster
                   `}
                   style={{
                     transition: "color 0.2s, transform 0.2s",
-                    fontWeight: isActive ? 600 : 500,
+                    fontWeight: 500, 
                   }}
                 >
                   {link.label}
@@ -141,13 +142,13 @@ export default function AdminNavbar() {
             </button>
             {open && (
               <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100 animate-fade-in">
-                <Link
+                {/* <Link
                   href="/admin/settings"
                   className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 transition"
                 >
                   <FiSettings className="text-blue-500" />
                   Settings
-                </Link>
+                </Link> */}
                 <button
                   className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 w-full text-left transition"
                   onClick={() => {

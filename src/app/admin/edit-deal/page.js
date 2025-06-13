@@ -8,7 +8,7 @@ const defaultDeal = {
   title: 'TechStartup Innovation Ltd',
   crmCode: 'TS-2024-001',
   sector: 'Technology',
-  stage: 'Series A',
+  stage: 'Growth',
   ticketSize: '₹50L - ₹5Cr',
   status: 'Open',
   summary: 'AI-powered healthcare platform revolutionizing patient care through advanced diagnostics and treatment recommendations.',

@@ -10,7 +10,7 @@ export default function EOIReviewPanel() {
     {
       id: 1,
       investor: { name: "Rajesh Kumar", type: "HNWI", avatar: "/avatar1.png" },
-      deal: { title: "TechStartup Innovation Ltd", sector: "Technology", stage: "Series A" },
+      deal: { title: "TechStartup Innovation Ltd", sector: "Technology", stage: "Early" },
       ticket: "₹2.5 Cr",
       nda: "Signed",
       status: "New",
@@ -21,7 +21,7 @@ export default function EOIReviewPanel() {
     {
       id: 2,
       investor: { name: "Priya Sharma", type: "Family Office", avatar: "/avatar2.png" },
-      deal: { title: "Green Energy Solutions", sector: "Clean Energy", stage: "Series B" },
+      deal: { title: "Green Energy Solutions", sector: "Clean Energy", stage: "Growth" },
       ticket: "₹5 Cr",
       nda: "Signed",
       status: "Assigned",
@@ -32,7 +32,7 @@ export default function EOIReviewPanel() {
     {
       id: 3,
       investor: { name: "Michael Chen", type: "Angel Investor", avatar: "/avatar3.png" },
-      deal: { title: "FinTech Revolution", sector: "Financial Services", stage: "Seed" },
+      deal: { title: "FinTech Revolution", sector: "Financial Services", stage: "Debt" },
       ticket: "₹75 L",
       nda: "Pending",
       status: "New",
@@ -43,7 +43,7 @@ export default function EOIReviewPanel() {
     {
       id: 4,
       investor: { name: "Sarah Johnson", type: "HNWI", avatar: "/avatar4.png" },
-      deal: { title: "Healthcare AI Platform", sector: "Healthcare", stage: "Series A" },
+      deal: { title: "Healthcare AI Platform", sector: "Healthcare", stage: "Pre-IPO" },
       ticket: "₹1 Cr",
       nda: "Signed",
       status: "New",

@@ -28,7 +28,7 @@ export default function SavedDealsPage() {
       id: 1,
       slug: "techflow-ai",
       title: "TechFlow AI",
-      stage: "Series A",
+      stage: "Early",
       sector: "FinTech",
       status: "Closing Soon",
       summary:
@@ -54,7 +54,7 @@ export default function SavedDealsPage() {
       id: 3,
       slug: "healthtech-solutions",
       title: "HealthTech Solutions",
-      stage: "Series B",
+      stage: "Debt",
       sector: "HealthTech",
       status: "Open",
       summary:
@@ -70,7 +70,8 @@ export default function SavedDealsPage() {
     selectedFilter === "All Deals"
       ? savedDeals
       : savedDeals.filter(
-          (deal) => deal.sector === selectedFilter || deal.stage === selectedFilter
+          (deal) =>
+            deal.sector === selectedFilter || deal.stage === selectedFilter
         );
 
   // Handlers
@@ -96,9 +97,14 @@ export default function SavedDealsPage() {
         onOpenFilters={handleOpenFilters}
       /> */}
       <div>
-        <div className="heading-section mb-2">Your Saved Deals</div>
-        <DealsGrid deals={filteredDeals} onView={handleView} isSavedDeals={true} />
+        {/* <div className="heading-section mb-2">Your Saved Deals</div>
+        <DealsGrid deals={filteredDeals} onView={handleView} isSavedDeals={true} /> */}
+
+        <div className="">
+          <h1 className="heading-main">Work in Progress</h1>
+          <p className="p-medium">This page is currently under development.</p>
+        </div>
       </div>
     </div>
   );
-} 
+}
