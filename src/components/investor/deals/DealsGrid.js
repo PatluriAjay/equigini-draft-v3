@@ -67,9 +67,10 @@ export default function DealsGrid({
             </div>
             {/* View Details Button and Bookmark Button in single line */}
             <div className="flex items-center gap-4 mt-3">
-              <button className="w-full bg-[#A330AE] hover:bg-[#8d2899] text-white py-2 rounded-xl font-semibold text-sm" onClick={() => onView && onView(deal.slug)}>
+              <button className="px-2 bg-[#A330AE] hover:bg-[#8d2899] text-white py-2 rounded-xl font-semibold text-sm" onClick={() => onView && onView(deal.slug)}>
                 View Details
               </button>
+               <button className="btn-primary flex-1">Download Teaser </button>
               {/* <button
                 className={`p-2 hover:bg-gray-100 rounded-full transition-colors ${deal.bookmarked ? "text-primarycolor" : "text-secondary3"}`}
                 onClick={() => handleBookmark(deal.id)}
@@ -78,9 +79,9 @@ export default function DealsGrid({
                 {deal.bookmarked ? <FaBookmark size={18} /> : <FaRegBookmark size={18} />}
               </button> */}
             </div>
-            <div className="flex items-center justify-between">
+            {/* <div className="flex items-center justify-between">
               <button className="btn-primary flex-1 mt-2">Download Teaser Document</button>
-            </div>
+            </div> */}
           </div>
         ))
       ) : (
@@ -125,19 +126,20 @@ export default function DealsGrid({
         </div>
         {/* View Details Button and Bookmark Button in single line */}
         <div className="flex items-center gap-4 mt-6">
-          <button className="w-full bg-[#A330AE] hover:bg-[#8d2899] text-white py-2 rounded-xl font-semibold text-sm">
+          <button className="px-2 bg-[#A330AE] hover:bg-[#8d2899] text-white py-2 rounded-xl font-semibold text-sm">
             View Details
           </button>
-          <button
+            <button className="btn-primary flex-1">Download Teaser </button>
+          {/* <button
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             aria-label="Bookmark"
           >
             <FaBookmark size={18} />
-          </button>
+          </button> */}
         </div>
-        <div className="flex items-center justify-between mt-4">
-          <button className="btn-primary flex-1">Download Teaser Document</button>
-        </div>
+        {/* <div className="flex items-center justify-between mt-4">
+          <button className="btn-primary flex-1">Download Teaser </button>
+        </div> */}
       </div>
     </div>
   );
