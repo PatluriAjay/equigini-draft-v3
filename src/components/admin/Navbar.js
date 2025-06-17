@@ -1,11 +1,12 @@
 "use client";
 import { MdNotificationsActive, MdSearch } from "react-icons/md";
-import { FiSettings, FiLogOut } from "react-icons/fi";
+import { FiSettings, FiLogOut, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
-export default function AdminNavbar() {
+export default function AdminNavbar({ collapsed, setCollapsed, sidebarOpen, setSidebarOpen }) {
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef(null);
@@ -50,16 +51,41 @@ export default function AdminNavbar() {
     }
   }, [searchOpen]);
 
-  return (
-     <header className="w-full flex items-center justify-center min-h-[56px] p-5 bg-white ">
+  // Helper to detect mobile (tailwind md: 768px)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
+  return (
+     <header className="w-full flex items-center justify-between h-[80px] p-5 bg-white ">
+        {/* Logo, sidebar toggle, and icon on the left */}
+        <div className="flex items-center gap-2">          <button
+            className="rounded-lg p-2 hover:bg-white/40 transition inline-block"
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            aria-label="Toggle sidebar"
+          >
+            {sidebarOpen ? (
+              <FiChevronLeft size={22} />
+            ) : (
+              <FiChevronRight size={22} />
+            )}
+          </button>
+          <Link href="/admin">
+            <Image
+              src="/equigini-logo.webp"
+              alt="Logo"
+              width={120}
+              height={50}
+              className="object-contain"
+              priority
+            />
+          </Link>
+        </div>
         <div className="flex-1 flex items-center justify-center">
           {/* Empty for spacing */}
         </div>
         <div className="flex items-center gap-4 relative">
           {/* Nav Links with horizontal slide animation */}
           <nav
-            className={`flex gap-8 items-center navbar-links ${searchOpen ? "navbar-links-slide-out" : "navbar-links-slide-in"}`}
+            className={`hidden md:flex gap-8 items-center navbar-links ${searchOpen ? "navbar-links-slide-out" : "navbar-links-slide-in"}`}
           >
             {navLinks.map((link) => {
               const isActive = pathname === link.href;

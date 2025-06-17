@@ -84,7 +84,8 @@ export default function SavedDealsPage() {
       {/* <div>
         <h1 className="heading-main">Saved Deals</h1>
       </div> */}
-      {/* <DealsFilterBar
+       <div className="heading-section mb-2">My Saved Deals</div>
+      <DealsFilterBar
         filters={filterOptions}
         selected={selectedFilter}
         onSelect={setSelectedFilter}
@@ -94,9 +95,9 @@ export default function SavedDealsPage() {
         sort={sort}
         onSort={setSort}
         onOpenFilters={handleOpenFilters}
-      /> */}
+      />
       <div>
-        <div className="heading-section mb-2">Your Saved Deals</div>
+       
         <DealsGrid deals={filteredDeals} onView={handleView} isSavedDeals={true} />
       </div>
     </div>

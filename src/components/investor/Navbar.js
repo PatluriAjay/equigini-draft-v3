@@ -16,8 +16,8 @@ export default function InvestorNavbar() {
   const navLinks = [
     { href: "/investor/dashboard", label: "Dashboard" },
     { href: "/investor/deals", label: "Deals" },
-    { href: "/investor/documents", label: "Documents" },
     { href: "/investor/saved-deals", label: "Watchlist" },
+    { href: "/investor/profile", label: "Profile" },
     // { href: "/investor/settings", label: "Settings" },
 
   ];
@@ -96,7 +96,7 @@ export default function InvestorNavbar() {
           {/* Right side icons */}
           <div className="flex items-center space-x-4">
             {/* Search */}
-            <div className="relative">
+            <div className="relative  ">
               <button
                 className="bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors duration-200"
                 onClick={handleSearchToggle}
@@ -151,7 +151,7 @@ export default function InvestorNavbar() {
             </div>
 
             {/* Notifications */}
-            <button className="bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center">
+            <button className="  bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center">
               <MdNotificationsActive size={25} />
             </button>
 
@@ -166,13 +166,13 @@ export default function InvestorNavbar() {
               </button>
               {open && (
                 <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100 animate-fade-in">
-                  <Link
+                  {/* <Link
                     href="/investor/profile"
                     className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 transition"
                   >
                     <FiUser className="text-primarycolor" />
                     Profile
-                  </Link>
+                  </Link> */}
                   {/* <Link
                     href="/investor/saved-deals"
                     className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 transition"

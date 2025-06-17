@@ -25,9 +25,9 @@ export default function StatsCards({ stats }) {
     },
   ];
   return (
-    <div className="grid grid-cols-2 gap-4 mb-6">
+    <div className="grid grid-cols-4 gap-4 mb-6">
       {summary.map((item) => (
-        <div key={item.label} className=" flex flex-row items-center gap-4">
+        <div key={item.label} className=" flex flex-row items-center gap-4 border border-gray-200 rounded-lg p-4 bg-white shadow-sm ">
           <div className="w-10 h-10 flex items-center justify-center rounded-full bg-primarycolor2">
             {item.icon}
           </div>

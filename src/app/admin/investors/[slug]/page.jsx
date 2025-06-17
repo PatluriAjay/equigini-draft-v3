@@ -1,6 +1,7 @@
 "use client";
 import ProfileHeader from "@/components/admin/investor-view/ProfileHeader";
 import ProfileTabs from "@/components/admin/investor-view/ProfileTabs";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 export default function InvestorDetailPage({ params }) {
@@ -35,6 +36,16 @@ export default function InvestorDetailPage({ params }) {
 
   return (
     <div className="mx-auto">
+    <div>
+      <nav className="flex items-center space-x-2 text-gray-600 mb-4">
+        <Link href="/admin" className="hover:underline">Home</Link>
+        <span className="text-gray-400">{">"}</span>
+        <Link href="/admin/investors" className="hover:underline">Investors</Link>
+        <span className="text-gray-400">{">"}</span>
+        <span className="font-semibold">{investor.full_name}</span>
+      </nav>
+    </div>
+      {/* Profile Header and Tabs */}
       <ProfileHeader investor={investor} source={source} />
       <ProfileTabs investor={investor} source={source} />
     </div>

@@ -1,0 +1,112 @@
+"use client";
+import React, { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+
+const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    try {
+      // TODO: Replace with your API call
+      // Example:
+      // const res = await fetch('/api/login', { method: 'POST', body: JSON.stringify({ username, password }) });
+      // const data = await res.json();
+      // if (!res.ok) throw new Error(data.message || 'Login failed');
+
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // On success, redirect or update state
+    } catch (err) {
+      setError(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#FAFAF4]">
+      <div className="w-full max-w-md bg-white rounded-2xl shadow-card p-8 flex flex-col items-center">
+        <div className="mb-6 flex flex-col items-center">
+          <Image
+            src="/equigini-logo.webp"
+            alt="Equigini Logo"
+            width={150}
+            height={80}
+            className="mb-2"
+            priority
+          />
+          {/* <h1 className="text-2xl font-bold text-center text-primarycolor font-primary mb-2">
+            Log in
+          </h1> */}
+        </div>
+        <form className="w-full flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div>
+            <label className="form-label ">Username or email</label>
+            <input
+              type="text"
+              className="form-input"
+              placeholder="Enter your username or email"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+          <div>
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              className="form-input"
+              placeholder="Password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+          {error && (
+            <div className="text-red-600 text-sm text-center">{error}</div>
+          )}
+          <div className="flex justify-center text-sm mt-1 mb-2">
+            <span className="text-secondary3">Forgot your &nbsp;</span>
+            <div>
+            
+              <Link
+                href="#"
+                className="text-primarycolor font-medium hover:underline"
+              >
+                password
+              </Link>
+              <span className="text-secondary3">?</span>
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="btn-primary w-full mt-2"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Log In"}
+          </button>
+        </form>
+        <div className="mt-6 text-center text-sm text-secondary3">
+          Don't have an account?{" "}
+          <Link
+            href="#"
+            className="text-primarycolor font-medium hover:underline"
+          >
+            Create an account.
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Login;

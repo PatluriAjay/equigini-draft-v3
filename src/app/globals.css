@@ -63,7 +63,7 @@ body {
 }
 
 .btn-tertiary {
-  @apply px-3 py-2 rounded-lg bg-secondary text-white font-semibold shadow hover:scale-90 transition-transform text-sm;
+  @apply px-3 py-2 rounded-lg bg-secondary text-white font-light shadow hover:scale-90 transition-transform text-sm;
 }
 
 .btn-delete {
@@ -170,6 +170,10 @@ body {
   @apply inline-block px-3 py-1 rounded-full text-xs font-medium align-middle;
 }
 
+.badge-row{
+  @apply flex flex-row gap-2;
+}
+
 .table-main {
   @apply min-w-full divide-y divide-gray-100 text-sm;
 }
@@ -240,4 +244,48 @@ body {
 
 .btn-icon-only {
   @apply p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-primarycolor;
+}
+
+
+
+
+.card-heading{
+  @apply text-sm font-semibold mb-1;
+}
+.card-subheading {
+  @apply text-gray-600 mb-2 text-sm;
+}
+.card-paragraph {
+  @apply text-sm flex items-center text-gray-600;
+}
+.card-paragraph2 {
+  @apply text-sm flex items-start text-gray-600;
+}
+
+.card-icon-div{
+  @apply w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center
+}
+
+.card-icon-svg{
+  @apply w-7 h-7 text-purple-600;
+}
+
+.text-start-override {
+  @apply text-start;
+}
+
+.text-lg-override {
+  @apply text-lg md:text-lg font-semibold ;
+  
+}
+.deal-heading-lg-override {
+  @apply text-xl  font-semibold ;
+  
+}
+.mb-0-override {
+  @apply mb-0;
+}
+
+.text-secondary-override {
+  @apply text-secondary;
 }

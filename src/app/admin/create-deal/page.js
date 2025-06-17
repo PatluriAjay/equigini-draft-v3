@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { FiInfo, FiFileText, FiUpload } from 'react-icons/fi'
 import { MdAdd, MdDelete } from 'react-icons/md';
 import Select from 'react-select'
+import Link from 'next/link';
 
 const reactSelectStyles = {
   control: (base, state) => ({
@@ -193,6 +194,15 @@ export default function CreateDealPage () {
       className='py-1'
       style={{ maxHeight: 'calc(100vh - 120px)', overflowY: 'auto' }}
     >
+        <div>
+      <nav className="flex items-center space-x-2 text-gray-600 mb-4">
+        <Link href="/admin" className="hover:underline">Home</Link>
+        <span className="text-gray-400">{">"}</span>
+        <Link href="/admin/deals" className="hover:underline">Deal</Link>
+        <span className="text-gray-400">{">"}</span>
+        <span className="font-semibold">Create Deal</span>
+      </nav>
+    </div>
       <div className='py-4 overflow-visible'>
         <h2 className='heading-main'>Create Deal</h2>
         {/* Stepper and Step Forms aligned in same container */}
