@@ -2,27 +2,57 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
+
+  // Dummy credentials
+  const DUMMY_CREDENTIALS = {
+    admin: {
+      email: "admin.equigini@gmail.com",
+      password: "123456",
+      redirect: "/admin/dashboard",
+    },
+    investor: {
+      email: "investor.equigini@gmail.com",
+      password: "123456",
+      redirect: "/investor/dashboard",
+    },
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-    try {
-      // TODO: Replace with your API call
-      // Example:
-      // const res = await fetch('/api/login', { method: 'POST', body: JSON.stringify({ username, password }) });
-      // const data = await res.json();
-      // if (!res.ok) throw new Error(data.message || 'Login failed');
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      // On success, redirect or update state
+    try {
+      // Check for admin credentials
+      if (
+        username === DUMMY_CREDENTIALS.admin.email &&
+        password === DUMMY_CREDENTIALS.admin.password
+      ) {
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
+        router.push(DUMMY_CREDENTIALS.admin.redirect);
+        return;
+      }
+
+      // Check for investor credentials
+      if (
+        username === DUMMY_CREDENTIALS.investor.email &&
+        password === DUMMY_CREDENTIALS.investor.password
+      ) {
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate API delay
+        router.push(DUMMY_CREDENTIALS.investor.redirect);
+        return;
+      }
+
+      // If no matching credentials
+      setError("Invalid email or password");
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
@@ -77,7 +107,6 @@ const Login = () => {
           <div className="flex justify-center text-sm mt-1 mb-2">
             <span className="text-secondary3">Forgot your &nbsp;</span>
             <div>
-            
               <Link
                 href="#"
                 className="text-primarycolor font-medium hover:underline"
@@ -96,7 +125,7 @@ const Login = () => {
           </button>
         </form>
         <div className="mt-6 text-center text-sm text-secondary3">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <Link
             href="#"
             className="text-primarycolor font-medium hover:underline"

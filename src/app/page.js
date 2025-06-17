@@ -1,7 +1,13 @@
+"use client";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
 export default function Home() {
-  return (
-    <div>
-      <h1 className="heading-main text-center min-h-screen flex justify-center items-center">Equigini</h1>
-    </div>
-  );
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/login');
+  }, [router]);
+
+  return null;
 }
