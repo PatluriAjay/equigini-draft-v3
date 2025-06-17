@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function ProfileHeaderCard() {
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-6 bg-white rounded-xl border p-6 mb-6">
+    <div className="flex flex-col sm:flex-row gap-6 bg-white rounded-xl border p-6 mb-6">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <span className="heading-main font-primary text-secondary">John Anderson</span>
