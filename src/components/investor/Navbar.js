@@ -3,7 +3,7 @@ import { MdNotificationsActive, MdSearch } from "react-icons/md";
 import { FiSettings, FiLogOut, FiUser, FiBookmark } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
 
 export default function InvestorNavbar() {
@@ -11,7 +11,8 @@ export default function InvestorNavbar() {
   const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef(null);
   const searchRef = useRef(null);
-  const pathname = usePathname();
+  const pathname = usePathname();         
+  const router = useRouter();
 
   const navLinks = [
     { href: "/investor/dashboard", label: "Dashboard" },
@@ -19,7 +20,6 @@ export default function InvestorNavbar() {
     { href: "/investor/saved-deals", label: "Watchlist" },
     { href: "/investor/profile", label: "Profile" },
     // { href: "/investor/settings", label: "Settings" },
-
   ];
 
   // Toggle search
@@ -58,7 +58,7 @@ export default function InvestorNavbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/investor">
+            <Link href="/investor" className="cursor-pointer">
               <Image
                 src="/equigini-logo.webp"
                 alt="Logo"
@@ -96,19 +96,24 @@ export default function InvestorNavbar() {
           {/* Right side icons */}
           <div className="flex items-center space-x-4">
             {/* Search */}
-            <div className="relative  ">
+            <div className="relative hidden md:block">
               <button
                 className="bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors duration-200"
                 onClick={handleSearchToggle}
                 aria-label={searchOpen ? "Close search" : "Open search"}
                 style={{ visibility: searchOpen ? "hidden" : "visible" }}
               >
-                <MdSearch size={22} className="transition-transform duration-300" />
+                <MdSearch
+                  size={22}
+                  className="transition-transform duration-300"
+                />
               </button>
               <div
                 ref={searchRef}
                 className={`absolute right-full top-1/2 -translate-y-1/2 bg-white border border-primarycolor rounded-lg shadow-sm flex items-center pl-2 navbar-search ${
-                  searchOpen ? "navbar-search-slide-in" : "navbar-search-slide-out"
+                  searchOpen
+                    ? "navbar-search-slide-in"
+                    : "navbar-search-slide-out"
                 }`}
                 style={{ zIndex: 20, width: 220 }}
               >
@@ -165,26 +170,32 @@ export default function InvestorNavbar() {
                 <span className="font-bold text-gray-700">I</span>
               </button>
               {open && (
-                <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100 animate-fade-in">
-                  {/* <Link
-                    href="/investor/profile"
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 transition"
-                  >
-                    <FiUser className="text-primarycolor" />
-                    Profile
-                  </Link> */}
-                  {/* <Link
-                    href="/investor/saved-deals"
-                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 transition"
-                  >
-                    <FiBookmark className="text-primarycolor" />
-                    Saved Deals
-                  </Link> */}
-                 
-                  <button
+                <div className=" absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100 animate-fade-in">
+                  {/* add navalinks here for mobile Dashboard Deals Watchlist Profile */}                  {navLinks.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setOpen(false)}
+                        className={`md:hidden flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 transition-colors duration-200 ${
+                          isActive ? "text-primarycolor" : ""
+                        }`}
+                      >
+                        {link.label === "Profile" ? (
+                          <FiUser />
+                        ) : link.label === "Deals" ? (
+                          <FiBookmark />
+                        ) : (
+                          <FiSettings />
+                        )}
+                        {link.label}
+                      </Link>
+                    );
+                  })}                  <button
                     className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 w-full text-left transition"
                     onClick={() => {
-                      /* Add logout logic here */
+                      router.push("/login");
                     }}
                   >
                     <FiLogOut className="text-red-500" />
