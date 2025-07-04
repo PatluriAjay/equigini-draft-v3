@@ -1,15 +1,17 @@
 "use client";
-export default function DealFilters() {
+export default function DealFilters({ searchValue = "", onSearch }) {
   return (
     <div className="flex flex-row flex-nowrap items-center w-full gap-20 justify-between">
       <div className="flex-shrink-0">
         <input
           type="text"
-          placeholder="Search by deal title..."
+          placeholder="Search..."
           className="search-input w-72"
+          value={searchValue}
+          onChange={(e) => onSearch && onSearch(e.target.value)}
         />
       </div>
-      <div className="flex flex-row flex-nowrap gap-3 items-center  w-full sm:w-8/12">
+      {/* <div className=" hidden flex-row flex-nowrap gap-3 items-center  w-full sm:w-8/12">
         <select className="form-select min-w-[150px] w-auto">
           <option>All Status</option>
           <option>Open</option>
@@ -25,15 +27,22 @@ export default function DealFilters() {
           <option>Real Estate</option>
           <option>Manufacturing</option>
         </select>
-      
-        <input type="date" className="form-input min-w-[150px] w-auto" placeholder="Date From" />
-        <input type="date" className="form-input min-w-[150px] w-auto" placeholder="Date To" />
+
+        <input
+          type="date"
+          className="form-input min-w-[150px] w-auto"
+          placeholder="Date From"
+        />
+        <input
+          type="date"
+          className="form-input min-w-[150px] w-auto"
+          placeholder="Date To"
+        />
         <button className="btn-primary flex items-center gap-1 whitespace-nowrap px-6">
           <span>Apply</span>
         </button>
-      </div>
-     
-      {/* <button className="btn-secondary flex items-center gap-1 whitespace-nowrap px-6"><span>Advanced Filters</span></button> */}
+      </div> */}
+      <button className="btn-primary">Export</button>
     </div>
   );
 }

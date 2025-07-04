@@ -19,7 +19,7 @@ export default function AnalystSidebar({ collapsed, setCollapsed }) {
     // { href: "/analyst/dashboard", label: "Dashboard", icon: FiHome },
     { href: "/analyst/eoi", label: "EOI", icon: FiFileText },
     { href: "/analyst/compliance", label: "Compliance", icon: FiFileText },
-    { href: "/analyst/documents", label: "Upload Documents", icon: FiUpload },
+    // { href: "/analyst/documents", label: "Upload Documents", icon: FiUpload },
   ];
 
   return (

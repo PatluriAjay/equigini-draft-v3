@@ -1,5 +1,7 @@
 export default function InvestorActions({ status, onApprove, onReject, onDeactivate }) {
-  if (status === "Pending Review") {
+  
+  // For pending investors, show approve/reject options
+  if (status === "Pending Review" || status === "Unverified") {
     return (
       <div className="flex gap-2">
         <button className="btn-primary" onClick={onApprove}>Approve</button>
@@ -7,10 +9,6 @@ export default function InvestorActions({ status, onApprove, onReject, onDeactiv
       </div>
     );
   }
-  if (status === "Verified") {
-    return (
-      <button className="btn-secondary" onClick={onDeactivate}>Deactivate</button>
-    );
-  }
+  
   return null;
 } 

@@ -1,20 +1,11 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ProfileDetails from "./ProfileDetails";
 import EOIList from "./EOIList";
 import LegalDocsList from "./LegalDocsList";
 import AccessLogsList from "./AccessLogsList";
-import EngagementList from "./EngagementList";
+import { getEOIsByInvestor } from "@/services/api";
 
-const sampleEOIs = [
-  { deal: "Deal Alpha", date: "2024-12-10", status: "pending", amount: 500000 },
-  {
-    deal: "Deal Beta",
-    date: "2024-12-12",
-    status: "approved",
-    amount: 1000000,
-  },
-];
 const sampleDocs = [
   {
     type: "nda",
@@ -49,35 +40,40 @@ const sampleLogs = [
     nda_status: false,
   },
 ];
-const sampleEngagements = [
-  {
-    deal: "Deal Alpha",
-    action: "Viewed",
-    date: "2024-12-10",
-    details: "Viewed deal details",
-  },
-  {
-    deal: "Deal Beta",
-    action: "Saved",
-    date: "2024-12-12",
-    details: "Added to watchlist",
-  },
-];
 
 export default function ProfileTabs({ investor, source = "management" }) {
   const [active, setActive] = useState(0);
+  const [eois, setEois] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch EOIs when EOI tab is active
+  useEffect(() => {
+    const fetchEOIs = async () => {
+      if (active === 1 && investor?._id) {
+        setLoading(true);
+        try {
+          const response = await getEOIsByInvestor(investor._id);
+          setEois(response.result_info.eois || []);
+        } catch (error) {
+          console.error("Error fetching EOIs:", error);
+          setEois([]);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchEOIs();
+  }, [active, investor?._id]);
 
   const tabs =
     source === "approval"
-      ? ["Profile Details", 
-        // "Legal Documents"
-      ]
+      ? ["Profile Details"]
       : [
           "Profile Details",
           "EOI Submissions",
           "Legal Documents",
           "Document Access Logs",
-          "Deal Engagement",
         ];
 
   return (
@@ -99,16 +95,14 @@ export default function ProfileTabs({ investor, source = "management" }) {
       </div>
       <div>
         {active === 0 && <ProfileDetails investor={investor} />}
-        {source !== "approval" && active === 1 && <EOIList eois={sampleEOIs} />}
-        {/* {active === (source === 'approval' ? 1 : 2) && <LegalDocsList docs={sampleDocs} />} */}
-        {active !== "approval" && active === 2 && (
+        {source !== "approval" && active === 1 && (
+          <EOIList eois={eois} loading={loading} />
+        )}
+        {source !== "approval" && active === 2 && (
           <LegalDocsList docs={sampleDocs} />
         )}
         {source !== "approval" && active === 3 && (
           <AccessLogsList logs={sampleLogs} />
-        )}
-        {source !== "approval" && active === 4 && (
-          <EngagementList engagements={sampleEngagements} />
         )}
       </div>
     </div>

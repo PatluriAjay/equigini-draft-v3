@@ -1,8 +1,6 @@
+"use client";
+import BlogListPage from "@/components/admin/blogs/BlogListPage";
+
 export default function BlogsPage() {
-  return (
-    <div className="">
-      <h1 className="heading-main">Work in Progress</h1>
-      <p className="p-medium">This page is currently under development.</p>
-    </div>
-  );
+  return <BlogListPage />;
 }

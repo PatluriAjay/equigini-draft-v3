@@ -1,110 +1,99 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import ModalMessage from "@/components/investor/ModalMessage";
+import Pagination from "@/components/common/Pagination";
 
-const initialSectors = [
-  { name: "Fintech", description: "Financial technology companies" },
-  { name: "Consumer", description: "Consumer goods and services" },
-  { name: "Healthcare", description: "Healthcare and medical sector" },
-  { name: "EdTech", description: "Education technology companies" },
-];
+const PAGE_SIZE = 10;
+const API_BASE = "http://localhost:4000/api";
 
-export default function CreateSectorPage() {
-  const [formData, setFormData] = useState({ name: "", description: "" });
-  const [errors, setErrors] = useState({});
-  const [sectors, setSectors] = useState(initialSectors);
-  const [editIdx, setEditIdx] = useState(null);
+export default function SectorManagementPage() {
+  const [sectors, setSectors] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [newSector, setNewSector] = useState("");
+  const [message, setMessage] = useState({ show: false, type: "success", text: "" });
+  const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(false);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name.trim()) newErrors.name = "Sector name is required";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      if (editIdx !== null) {
-        setSectors((prev) => prev.map((s, idx) => idx === editIdx ? { ...formData } : s));
-        setEditIdx(null);
+  // Fetch sectors from backend
+  const fetchSectors = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE}/getAllSectors`);
+      const result = await response.json();
+      if (result.status === "S" && Array.isArray(result.result_info)) {
+        setSectors(result.result_info.map(s => ({ name: s.name })));
       } else {
-        setSectors((prev) => [...prev, { ...formData }]);
+        setMessage({ show: true, type: "error", text: result.error_info || "Failed to fetch sectors." });
       }
-      setFormData({ name: "", description: "" });
-      setErrors({});
+    } catch (err) {
+      setMessage({ show: true, type: "error", text: err.message || "Failed to fetch sectors." });
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleEdit = (idx) => {
-    setEditIdx(idx);
-    setFormData({ ...sectors[idx] });
-  };
+  useEffect(() => {
+    fetchSectors();
+  }, []);
 
-  const handleDelete = (idx) => {
-    setSectors((prev) => prev.filter((_, i) => i !== idx));
-    if (editIdx === idx) setEditIdx(null);
+  // Filtered and paginated sectors
+  const filteredSectors = sectors.filter(s => s.name.toLowerCase().includes(search.toLowerCase()));
+  const totalPages = Math.ceil(filteredSectors.length / PAGE_SIZE);
+  const paginatedSectors = filteredSectors.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
+  // Create sector API call
+  const handleCreateSector = async (e) => {
+    e.preventDefault();
+    if (!newSector.trim()) {
+      setMessage({ show: true, type: "error", text: "Sector name is required." });
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE}/createSector`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newSector.trim(), created_by: 1 })
+      });
+      const result = await response.json();
+      if (result.status === "S") {
+        setMessage({ show: true, type: "success", text: "Sector created successfully!" });
+        setShowModal(false);
+        setNewSector("");
+        fetchSectors();
+      } else {
+        setMessage({ show: true, type: "error", text: result.error_info || "Failed to create sector." });
+      }
+    } catch (err) {
+      setMessage({ show: true, type: "error", text: err.message || "Failed to create sector." });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="min-h-screen">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4 gap-3">
-        <div>
-          <h1 className="heading-main ">Sector Management</h1>
-        </div>
+      {/* Top Bar: Heading and Create Button */}
+      <div className="flex flex-row items-center justify-between mb-4 gap-3">
+        <h1 className="heading-main ">Sector Management</h1>
+        <button className="btn-primary w-fit px-6"  onClick={() => setShowModal(true)}>+ Create</button>
       </div>
 
-      {/* Form Card */}
-      <div className="bg-white rounded-lg p-4 pt-2 mb-6">
-        <form onSubmit={handleSubmit} autoComplete="off">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <div className="md:col-span-4">
-              <label htmlFor="sectorName" className="form-label">
-                Sector Name
-              </label>
-              <input
-                id="sectorName"
-                type="text"
-                className={`form-input${errors.name ? " border-red-500 ring-red-200" : ""}`}
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                placeholder="Enter sector name"
-                aria-describedby={errors.name ? "nameError" : undefined}
-              />
-              {errors.name && <div id="nameError" className="text-red-500 text-xs mt-1">{errors.name}</div>}
-            </div>
-            <div className="md:col-span-6">
-              <label htmlFor="description" className="form-label">
-                Description
-              </label>
-              <input
-                id="description"
-                type="text"
-                className={`form-input${errors.description ? " border-red-500 ring-red-200" : ""}`}
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Enter sector description"
-                aria-describedby={errors.description ? "descriptionError" : undefined}
-              />
-              {errors.description && <div id="descriptionError" className="text-red-500 text-xs mt-1">{errors.description}</div>}
-            </div>
-            <div className="md:col-span-2">
-              <button type="submit" className="btn-primary w-full py-2">
-                {editIdx !== null ? "Update Sector" : "Add Sector"}
-              </button>
-            </div>
-          </div>
-        </form>
+      {/* Search and Export Row */}
+      <div className="flex  items-center w-full justify-between mb-5">
+      <div className="flex-shrink-0">
+        <input
+          type="text"
+          className="search-input w-72"
+          placeholder="Search..."
+          value={search}
+          onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
+        />
+        </div>
+        <button className="btn-primary w-fit">Export</button>
       </div>
 
       {/* Table Card */}
@@ -114,18 +103,16 @@ export default function CreateSectorPage() {
             <thead>
               <tr className="table-header-row">
                 <th className="table-th">SECTOR NAME</th>
-                <th className="table-th">DESCRIPTION</th>
                 <th className="table-th">ACTIONS</th>
               </tr>
             </thead>
             <tbody>
-              {sectors.map((sector, idx) => (
-                <tr key={sector.name} className="table-row hover:bg-white">
+              {paginatedSectors.map((sector, idx) => (
+                <tr key={sector.name + idx} className="table-row hover:bg-white">
                   <td className="table-td font-semibold">{sector.name}</td>
-                  <td className="table-td">{sector.description}</td>
                   <td className="table-td flex gap-2 items-center">
-                    <button className="btn-inline text-gray-700" title="Edit" type="button" onClick={() => handleEdit(idx)}><FaEdit size={20} /></button>
-                    <button className="btn-inline text-gray-700" title="Delete" type="button" onClick={() => handleDelete(idx)}><MdDelete size={20} /></button>
+                    <button className="btn-inline text-gray-700" title="Edit" type="button"><FaEdit size={20} /></button>
+                    <button className="btn-inline text-gray-700" title="Delete" type="button"><MdDelete size={20} /></button>
                   </td>
                 </tr>
               ))}
@@ -133,6 +120,56 @@ export default function CreateSectorPage() {
           </table>
         </div>
       </div>
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+        totalItems={filteredSectors.length}
+        itemsPerPage={PAGE_SIZE}
+      />
+
+      {/* Create Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative text-center">
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-2xl"
+              onClick={() => setShowModal(false)}
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <h2 className="heading-main mb-4 text-primarycolor">Create Sector</h2>
+            <form onSubmit={handleCreateSector}>
+              <input
+                type="text"
+                className="form-input w-full mb-4"
+                placeholder="Enter sector name"
+                value={newSector}
+                onChange={e => setNewSector(e.target.value)}
+                autoFocus
+              />
+              <button
+                className="btn-primary w-full"
+                type="submit"
+                disabled={loading}
+              >
+                {loading ? "Creating..." : "Create"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Success/Error Message Modal */}
+      <ModalMessage
+        show={message.show}
+        type={message.type}
+        message={message.text}
+        onClose={() => setMessage({ show: false, type: "success", text: "" })}
+      />
     </div>
   );
 }

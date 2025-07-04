@@ -53,9 +53,9 @@ export default function InvestorNavbar() {
   }, [searchOpen]);
 
   return (
-    <header className="w-full flex items-center justify-center bg-white backdrop-blur-lg drop-shadow-[0_4px_6px_rgba(190,190,190,0.3)] border border-white rounded">
-      <div className="container mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
+    <header className="w-full flex items-center justify-center bg-white backdrop-blur-lg drop-shadow-[0_4px_6px_rgba(190,190,190,0.3)] border border-white rounded h-[10vh] min-h-[60px]">
+      <div className="container mx-auto px-6 h-full flex items-center">
+        <div className="flex items-center justify-between h-full w-full">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/investor" className="cursor-pointer">
@@ -96,7 +96,7 @@ export default function InvestorNavbar() {
           {/* Right side icons */}
           <div className="flex items-center space-x-4">
             {/* Search */}
-            <div className="relative hidden md:block">
+            {/* <div className="relaive hidden md:block">
               <button
                 className="bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors duration-200"
                 onClick={handleSearchToggle}
@@ -153,12 +153,12 @@ export default function InvestorNavbar() {
                   </button>
                 </form>
               </div>
-            </div>
+            </div> */}
 
             {/* Notifications */}
-            <button className="  bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center">
+            {/* <button className="  bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center">
               <MdNotificationsActive size={25} />
-            </button>
+            </button> */}
 
             {/* User menu */}
             <div className="relative" ref={menuRef}>
@@ -171,30 +171,10 @@ export default function InvestorNavbar() {
               </button>
               {open && (
                 <div className=" absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg py-2 z-50 border border-gray-100 animate-fade-in">
-                  {/* add navalinks here for mobile Dashboard Deals Watchlist Profile */}                  {navLinks.map((link) => {
-                    const isActive = pathname === link.href;
-                    return (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        onClick={() => setOpen(false)}
-                        className={`md:hidden flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 transition-colors duration-200 ${
-                          isActive ? "text-primarycolor" : ""
-                        }`}
-                      >
-                        {link.label === "Profile" ? (
-                          <FiUser />
-                        ) : link.label === "Deals" ? (
-                          <FiBookmark />
-                        ) : (
-                          <FiSettings />
-                        )}
-                        {link.label}
-                      </Link>
-                    );
-                  })}                  <button
+                  <button
                     className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 w-full text-left transition"
                     onClick={() => {
+                      localStorage.clear();
                       router.push("/login");
                     }}
                   >

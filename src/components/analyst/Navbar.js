@@ -4,8 +4,10 @@ import { FiUser, FiLogOut, FiBookmark } from "react-icons/fi";
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function AnalystNavbar() {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const menuRef = useRef(null);
@@ -82,7 +84,7 @@ export default function AnalystNavbar() {
         </nav>
 
         {/* Search icon and input */}
-        <div className="relative">
+        {/* <div className="relative">
           <button
             className="bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center transition-colors duration-200"
             onClick={handleSearchToggle}
@@ -134,12 +136,12 @@ export default function AnalystNavbar() {
               </button>
             </form>
           </div>
-        </div>
+        </div> */}
 
         {/* Notification icon */}
-        <button className="bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center">
+        {/* <button className="bg-gray-100/80 rounded-full p-2 shadow min-h-[40px] min-w-[40px] flex items-center justify-center">
           <MdNotificationsActive size={25} />
-        </button>
+        </button> */}
 
         {/* User menu */}
         <div className="relative" ref={menuRef}>
@@ -169,7 +171,8 @@ export default function AnalystNavbar() {
               <button
                 className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-blue-50 w-full text-left transition"
                 onClick={() => {
-                  /* Add logout logic here */
+                  localStorage.clear();
+                  router.push("/login");
                 }}
               >
                 <FiLogOut className="text-red-500" />

@@ -5,107 +5,112 @@ import { MdEdit } from "react-icons/md";
 import { useRouter } from "next/navigation";
 import { MdDelete } from "react-icons/md";
 
-export default function InvestorTable({ investors, onApprove, onReject, onDeactivate }) {
+// Custom date formatting function
+const formatDate = (dateString) => {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+};
+
+export default function InvestorTable({
+  investors,
+  onApprove,
+  onReject,
+  onDeactivate,
+}) {
   const router = useRouter();
-  // Placeholder data for now
-  const rows = [
-    {
-      id: 1,
-      name: "Sarah Johnson",
-      email: "sarah.johnson@familyoffice.com",
-      type: "Family Office",
-      // status: "Verified",
-      nda: "Signed",
-      created_at: "Nov 28, 2024",
-      role: "Investor",
-    },
-    {
-      id: 2,
-      name: "David Chen",
-      email: "david.chen@angelinvest.com",
-      type: "Angel Investor",
-      // status: "Verified",
-      nda: "Signed",
-      created_at: "Oct 12, 2024",
-      role: "Investor",
-    },
-  ];
 
   // Badge color mapping
   const typeBadge = {
-    "HNWI": "bg-blue-100 text-blue-700",
+    HNWI: "bg-blue-100 text-blue-700",
     "Family Office": "",
     "Angel Investor": "",
-    "Other": "",
+    Other: "",
   };
   const statusBadge = {
     "Pending Review": "bg-orange-100 text-orange-700",
-    "Verified": "",
-    "Unverified": "",
-    "Deactivated": "",
+    Verified: "",
+    Unverified: "",
+    Deactivated: "",
   };
   const ndaBadge = {
-    "Signed": "",
+    Signed: "",
     "Not Signed": "",
   };
 
-  // Helper to create slug from name
-  const getSlug = (name) => name.toLowerCase().replace(/ /g, "-");
-
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto w-full max-w-xs sm:max-w-sm md:max-w-full">
       <table className="table-main">
         <thead>
           <tr className="table-header-row">
             {/* <th className="table-th"><input type="checkbox" className="form-checkbox" /></th> */}
-            <th className="table-th">INVESTOR DETAILS</th>
+            <th className="table-th">INVESTOR NAME</th>
+            <th className="table-th">EMAIL</th>
             <th className="table-th">TYPE</th>
-            {/* <th className="table-th">STATUS</th> */}
-            <th className="table-th">NDA STATUS</th>
             <th className="table-th">REGISTRATION DATE</th>
             <th className="table-th">ACTIONS</th>
           </tr>
         </thead>
         <tbody>
-          {rows.map((inv) => (
-            <tr 
-              key={inv.id} 
-              className="table-row hover:bg-white cursor-pointer" 
-              onClick={() => router.push(`/admin/investors/${getSlug(inv.name)}?source=management`)}
-            >
-              {/* <td className="table-td"><input type="checkbox" className="form-checkbox" /></td> */}
-              <td className="table-td">
-                <div className="flex items-center gap-2">
-                  <div>
-                    <div className="font-semibold text-sm">{inv.name}</div>
-                    <div className="text-xs text-gray-500">{inv.email}</div>
-                  </div>
-                </div>
-              </td>
-              <td className="table-td">
-                <span className={` ${typeBadge[inv.type] || ""}`}>{inv.type}</span>
-              </td>
-              {/* <td className="table-td">
-                <span className={`badge ${statusBadge[inv.status] || "bg-gray-100 text-gray-700"}`}>{inv.status}</span>
-              </td> */}
-              <td className="table-td">
-                <span className={` ${ndaBadge[inv.nda] || ""}`}>{inv.nda}</span>
-              </td>
-              <td className="table-td">{inv.created_at}</td>
-              <td className="table-td flex gap-2 items-center">
-                <InvestorActions
-                  status={inv.status}
-                  onApprove={() => onApprove(inv.id)}
-                  onReject={() => onReject(inv.id)}
-                  onDeactivate={() => onDeactivate(inv.id)}
-                />
-                <button className="btn-inline text-gray-700" title="Edit" onClick={() => router.push(`/admin/investors/${getSlug(inv.name)}?source=management`)}><FaEdit size={20} color="" /></button>
-                <button className="btn-inline text-gray-700" title="Delete"><MdDelete  size={20} color="" /></button>
+          {investors && investors.length > 0 ? (
+            investors.map((inv) => (
+              <tr
+                key={inv._id}
+                className="table-row hover:bg-white cursor-pointer"
+                onClick={() =>
+                  router.push(
+                    `/admin/investors/${inv._id}`
+                  )
+                }
+              >
+                {/* <td className="table-td"><input type="checkbox" className="form-checkbox" /></td> */}
+                <td className="table-td">
+                  <div className="font-semibold text-sm">{inv.full_name || '-'}</div>
+                </td>
+                <td className="table-td">{inv.email || '-'}</td>
+                <td className="table-td">
+                    {inv.investor_type || '-'}
+                </td>
+                <td className="table-td">
+                  {formatDate(inv.createdAt)}
+                </td>
+                <td className="table-td flex gap-2 items-center">
+                  <InvestorActions
+                    status={inv.is_approved ? "Approved" : "Pending Review"}
+                    onApprove={() => onApprove(inv._id)}
+                    onReject={() => onReject(inv._id)}
+                    onDeactivate={() => onDeactivate(inv._id)}
+                  />
+                  <button
+                    className="btn-inline text-gray-700"
+                    title="View"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(
+                        `/admin/investors/${inv._id}`
+                      );
+                    }}
+                  >
+                    <FaEdit size={20} color="" />
+                  </button>
+                  <button className="btn-inline text-gray-700" title="Delete">
+                    <MdDelete size={20} color="" />
+                  </button>
+                </td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan={5} className="table-empty">
+                No approved investors found.
               </td>
             </tr>
-          ))}
+          )}
         </tbody>
       </table>
     </div>
   );
-} 
+}

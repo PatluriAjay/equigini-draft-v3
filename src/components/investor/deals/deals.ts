@@ -12,6 +12,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1461749280684-dccba630e2f6?auto=format&fit=crop&w=400&q=80",
     description: "AI-powered financial analytics platform revolutionizing investment decision-making for institutional investors across emerging markets.",
     irr: "25-30%",
+    eoi_submitted: true,
   },
   // {
   //   id: 2,
@@ -38,6 +39,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
     description: "Next-gen e-commerce platform enabling seamless online retail experiences for millions of users.",
     irr: "18-22%",
+    eoi_submitted: false,
   },
   {
     id: 4,
@@ -52,6 +54,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
     description: "Digital health platform connecting patients with healthcare providers through innovative telemedicine solutions.",
     irr: "30-35%",
+    eoi_submitted: true,
   },
   {
     id: 5,
@@ -66,6 +69,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=400&q=80",
     description: "Leading renewable energy solutions provider with operations across 15 countries and growing market presence.",
     irr: "20-25%",
+    eoi_submitted: false,
   },
   {
     id: 6,
@@ -80,6 +84,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1503676382389-4809596d5290?auto=format&fit=crop&w=400&q=80",
     description: "Revolutionary educational technology platform making quality education accessible through AI-driven personalized learning.",
     irr: "35-40%",
+    eoi_submitted: true,
   },
   {
     id: 8,
@@ -94,6 +99,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1510511459019-5dda7724fd87?auto=format&fit=crop&w=400&q=80",
     description: "Advanced cybersecurity solutions provider protecting enterprises from emerging digital threats with AI-powered defense systems.",
     irr: "28-32%",
+    eoi_submitted: false,
   },
   {
     id: 9,
@@ -108,6 +114,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=400&q=80",
     description: "Empowering women entrepreneurs through funding and mentorship in diverse sectors.",
     irr: "22-27%",
+    eoi_submitted: true,
   },
   {
     id: 10,
@@ -122,6 +129,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
     description: "Blockchain-based platform enabling secure and transparent digital transactions for global businesses.",
     irr: "19-24%",
+    eoi_submitted: false,
   },
   {
     id: 12,
@@ -136,6 +144,7 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1461344577544-4e5dc9487184?auto=format&fit=crop&w=400&q=80",
     description: "Cloud-based SaaS platform streamlining business operations for SMEs worldwide.",
     irr: "21-26%",
+    eoi_submitted: true,
   },
   {
     id: 13,
@@ -150,5 +159,6 @@ export const deals = [
     imageUrl: "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
     description: "Network of direct-to-consumer brands leveraging digital channels for rapid growth.",
     irr: "23-29%",
+    eoi_submitted: false,
   },
 ];

@@ -1,71 +1,273 @@
 import React, { useEffect, useState } from "react";
-import { FaRegEye } from 'react-icons/fa';
 import { MdFileDownload } from 'react-icons/md';
+import { FaEye } from 'react-icons/fa';
+import { GoBookmark, GoBookmarkFill } from 'react-icons/go';
+import Link from "next/link";
+import EOIModal from "../EOIModal";
+import ModalMessage from "../ModalMessage";
+import NDAModal from "../NDAModal";
+import Loader from "../../common/Loader";
+import { getDealBySlug, checkEOIStatus, checkNDAStatus, toggleDealInWatchlist, isDealInWatchlist } from "../../../services/api";
 
 export default function DealDetail({ dealSlug }) {
   const [deal, setDeal] = useState(null);
-  const [activeTab, setActiveTab] = useState("Executive Summary");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState("Summary");
+  const [showEOIModal, setShowEOIModal] = useState(false);
+  const [showMsg, setShowMsg] = useState(false);
+  const [msgType, setMsgType] = useState("success");
+  const [msgText, setMsgText] = useState("");
+  const [eoiForm, setEoiForm] = useState({
+    ticketSize: '',
+    rationale: '',
+    timeline: '',
+    contactMethod: '',
+    contactType: null,
+    contactValue: '',
+  });
+  const [showNDAModal, setShowNDAModal] = useState(false);
+  const [eoiSubmitted, setEoiSubmitted] = useState(false);
+  const [ndaSigned, setNdaSigned] = useState(false);
+  const [statusLoading, setStatusLoading] = useState(true);
+  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
   const tabSections = [
-    { label: "Executive Summary", key: "Executive Summary" },
-    { label: "Investment Thesis", key: "Investment Thesis" },
-    { label: "Sector Overview", key: "Sector Overview" },
+    { label: "Summary", key: "Summary" },
     { label: "Deal Structure & Ticket Size", key: "Deal Structure & Ticket Size" },
   ];
 
+  // Get investor ID from localStorage
+  const getInvestorId = () => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        return user._id || user.id || null;
+      } catch (parseError) {
+        console.error("Error parsing user data from localStorage:", parseError);
+        return null;
+      }
+    }
+    return null;
+  };
+
+  const handleBookmarkToggle = async () => {
+    const investorId = getInvestorId();
+    if (!investorId || !deal) {
+      console.error("Investor ID or deal not available");
+      return;
+    }
+
+    setBookmarkLoading(true);
+    try {
+      const result = await toggleDealInWatchlist(investorId, deal._id);
+      if (result.status === "S") {
+        setIsBookmarked(result.result_info.action === "added");
+        setMsgType("success");
+        setMsgText(result.result_info.message);
+        setShowMsg(true);
+      }
+    } catch (error) {
+      console.error("Error toggling bookmark:", error);
+      setMsgType("error");
+      setMsgText("Failed to update bookmark. Please try again.");
+      setShowMsg(true);
+    } finally {
+      setBookmarkLoading(false);
+    }
+  };
+
+  // Check bookmark status
+  const checkBookmarkStatus = async (investorId, dealId) => {
+    try {
+      const result = await isDealInWatchlist(investorId, dealId);
+      if (result.status === "S") {
+        setIsBookmarked(result.result_info.is_in_watchlist);
+      }
+    } catch (error) {
+      console.error("Error checking bookmark status:", error);
+    }
+  };
+
   useEffect(() => {
-    setTimeout(() => {
-      setDeal({
-        slug: dealSlug,
-        title: "Series A Investment in ZappyPay",
-        status: "Open",
-        sector: "FinTech",
-        stage: "Series A",
-        ticketSize: "₹50L - ₹5Cr",
-        timeline: "6-8 Weeks",
-        expectedIrr: "25-30%",
-        location: "India",
-        summary: "ZappyPay is revolutionizing digital payments in India with its innovative UPI-based platform targeting small merchants and rural customers. The company has demonstrated strong product-market fit with 2M+ active users and ₹500Cr+ monthly transaction volume.",
-        documents: [
-          { name: "ZappyPay_Teaser.pdf", type: "teaser", size: "2.3 MB", url: "#" },
-          { name: "Investment_Memorandum.pdf", type: "memorandum", size: "8.7 MB", url: "#" },
-          { name: "Financial_Model.xlsx", type: "financial", size: "3.1 MB", url: "#" },
-          { name: "Pitch_Deck.pdf", type: "pitch", size: "12 MB", url: "#" },
-          { name: "Legal_Documents.pdf", type: "legal", size: "1.2 MB", url: "#" },
-        ],
-        executiveSummary: "ZappyPay is revolutionizing digital payments in India...",
-        thesis: "Investment thesis content goes here...",
-        sectorOverview: "FinTech sector overview...",
-        structure: "Deal structure and ticket size details...",
-      });
-    }, 500);
+    const fetchDealAndStatus = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Fetch deal data
+        const dealResponse = await getDealBySlug(dealSlug);
+        if (dealResponse.result_info) {
+          setDeal(dealResponse.result_info);
+          
+          // Fetch EOI, NDA, and bookmark status
+          setStatusLoading(true);
+          try {
+            const investorId = getInvestorId();
+            
+            if (investorId) {
+              // Use Promise.all to fetch all statuses in parallel
+              const [eoiResponse, ndaResponse] = await Promise.all([
+                checkEOIStatus(investorId, dealResponse.result_info._id),
+                checkNDAStatus(investorId, dealResponse.result_info._id)
+              ]);
+              
+              setEoiSubmitted(eoiResponse.result_info?.submitted || false);
+              setNdaSigned(ndaResponse.result_info?.is_signed || false);
+              
+              // Check bookmark status
+              await checkBookmarkStatus(investorId, dealResponse.result_info._id);
+            } else {
+              // Set default values if no investor ID
+              setEoiSubmitted(false);
+              setNdaSigned(false);
+              setIsBookmarked(false);
+            }
+          } catch (statusError) {
+            console.error("Error fetching status:", statusError);
+            // Set default values if status check fails
+            setEoiSubmitted(false);
+            setNdaSigned(false);
+            setIsBookmarked(false);
+          } finally {
+            setStatusLoading(false);
+          }
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error("Error fetching deal:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (dealSlug) {
+      fetchDealAndStatus();
+    }
   }, [dealSlug]);
 
-  if (!deal) return null;
+  if (loading) {
+    return <Loader text="Loading deal details..." />;
+  }
+
+  if (error) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="text-lg text-red-600 mb-2">Error: {error}</div>
+          <Link href="/investor/deals" className="btn-primary">
+            Back to Deals
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  if (!deal) {
+    return (
+      <div className="flex justify-center items-center h-64">
+        <div className="text-center">
+          <div className="text-lg text-gray-600 mb-2">Deal not found</div>
+          <Link href="/investor/deals" className="btn-primary">
+            Back to Deals
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Helper function to construct image URL
+  const getImageUrl = (imageData) => {
+    if (!imageData || !imageData.path) return null;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const cleanPath = imageData.path.replace(/\\/g, '/');
+    return `${baseUrl}/${cleanPath}`;
+  };
+
+  // Helper function to construct document URL
+  const getDocumentUrl = (documentData) => {
+    if (!documentData || !documentData.path) return null;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const cleanPath = documentData.path.replace(/\\/g, '/');
+    return `${baseUrl}/${cleanPath}`;
+  };
+
+  // Transform backend data to frontend format
+  const transformedDeal = {
+    slug: deal.slug || '',
+    title: deal.deal_title || '',
+    status: deal.status || '',
+    sector: deal.sector || '',
+    stage: deal.stage || '',
+    ticketSize: deal.ticket_size_range || '',
+    timeline: deal.timeline , // Use backend value or fallback
+    expectedIrr: deal.expected_irr , // Use backend value or fallback
+    location: deal.geography || '',
+    summary: deal.summary || deal.full_description || '',
+    full_description: deal.full_description || '',
+    imageUrl: getImageUrl(deal.image),
+    teaserDocument: deal.teaser_document,
+    dealCollateral: deal.deal_collateral,
+    executiveSummary: deal.summary || deal.full_description || '',
+    thesis: "Investment thesis content goes here...", // Default value
+    sectorOverview: "Sector overview content goes here...", // Default value
+    structure: "Deal structure and ticket size details...", // Default value
+  };
 
   return (
     <div className="flex flex-col min-h-screen font-primary">
+        <nav className="flex items-center justify-between text-gray-600 mb-4">
+          <div className="flex items-center space-x-2">
+            <Link href="/investor" className="hover:underline">Home</Link>
+            <span className="text-gray-400">{">"}</span>
+            <Link href="/investor/deals" className="hover:underline">Deals</Link>
+            <span className="text-gray-400">{">"}</span>
+            <span className="font-semibold truncate block max-w-full">{transformedDeal.title}</span>
+          </div>
+          <button
+            onClick={handleBookmarkToggle}
+            disabled={bookmarkLoading}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 disabled:opacity-50"
+            title={isBookmarked ? "Remove from bookmarks" : "Add to bookmarks"}
+          >
+            {bookmarkLoading ? (
+              <div className="w-6 h-6 border-2 border-primarycolor border-t-transparent rounded-full animate-spin"></div>
+            ) : isBookmarked ? (
+              <GoBookmarkFill className="w-6 h-6 text-primarycolor" />
+            ) : (
+              <GoBookmark className="w-6 h-6 text-gray-600 hover:text-primarycolor" />
+            )}
+          </button>
+        </nav>
       {/* Top Banner Image with Title Overlay */}
       <div className="w-full h-48 relative overflow-hidden">
-        <img 
-          src="https://images.unsplash.com/photo-1550565118-3a14e8d0386f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2340&q=80"
-          alt="Finance Background"
-          className="w-full h-full object-cover"
-        />
+        {transformedDeal.imageUrl ? (
+          <img 
+            src={transformedDeal.imageUrl}
+            alt={transformedDeal.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <div className="text-4xl text-gray-400">{transformedDeal.title.charAt(0)}</div>
+          </div>
+        )}
         <div className="absolute inset-0 sidebar-gradient opacity-90" />
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <div className="flex items-center justify-between">
-            <h1 className="deal-heading-lg-override text-white mb-0">{deal.title}</h1>
+            <h1 className="deal-heading-lg-override text-white mb-0">{transformedDeal.title}</h1>
             <span className={`badge ${
-              deal.status === "Open" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
+              transformedDeal.status === "Open" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"
             }`}>
-              {deal.status}
+              {transformedDeal.status}
             </span>
           </div>
         </div>
       </div>
 
-      <div className="mx-auto w-full pb-20">
+      <div className="mx-auto w-full pb-5">
         {/* Main Content Area */}
         <div className="bg-white rounded-xl shadow-card p-6 mb-6">
           {/* Key Info Boxes */}
@@ -79,7 +281,7 @@ export default function DealDetail({ dealSlug }) {
                 </div>
               </div>
               <p className="card-heading">Ticket Size</p>
-              <p className="card-paragraph2">{deal.ticketSize}</p>
+              <p className="card-paragraph2">{transformedDeal.ticketSize}</p>
             </div>
             <div className="card-bordered">
               <div className="flex items-center gap-2 mb-2">
@@ -90,7 +292,7 @@ export default function DealDetail({ dealSlug }) {
                 </div>
               </div>
               <p className="card-heading">Expected IRR</p>
-              <p className="card-paragraph2">{deal.expectedIrr}</p>
+              <p className="card-paragraph2">{transformedDeal.expectedIrr}</p>
             </div>
             <div className="card-bordered">
               <div className="flex items-center gap-2 mb-2">
@@ -101,7 +303,7 @@ export default function DealDetail({ dealSlug }) {
                 </div>
               </div>
               <p className="card-heading">Timeline</p>
-              <p className="card-paragraph2">{deal.timeline}</p>
+              <p className="card-paragraph2">{transformedDeal.timeline}</p>
             </div>
             <div className="card-bordered">
               <div className="flex items-center gap-2 mb-2">
@@ -112,27 +314,34 @@ export default function DealDetail({ dealSlug }) {
                 </div>
               </div>
               <p className="card-heading">Sector</p>
-              <p className="card-paragraph2">{deal.sector}</p>
+              <p className="card-paragraph2">{transformedDeal.sector}</p>
             </div>
           </div>
 
           {/* Deal Teaser */}
-          <div className="card-bordered bg-purple-50 mb-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="card-heading text-primarycolor">Deal Teaser</p>
-                <p className="card-paragraph">{deal.documents[0].name} <span className="text-gray-400">({deal.documents[0].size})</span></p>
-              </div>
-              <div className="flex gap-2">
-                {/* <button className="btn-icon-only">
-                  <FaRegEye className="w-5 h-5 text-primarycolor" />
-                </button> */}
-                <button className="btn-icon-only">
-                  <MdFileDownload className="w-5 h-5 text-primarycolor" />
-                </button>
+          {transformedDeal.teaserDocument && (
+            <div className="card-bordered bg-purple-50 mb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="card-heading text-primarycolor">Deal Teaser</p>
+                  <p className="card-paragraph">{transformedDeal.teaserDocument.originalname} <span className="text-gray-400">({(transformedDeal.teaserDocument.size / 1024 / 1024).toFixed(1)} MB)</span></p>
+                </div>
+                <div className="flex gap-2">
+                  <button 
+                    className="btn-icon-only"
+                    onClick={() => {
+                      const documentUrl = getDocumentUrl(transformedDeal.teaserDocument);
+                      if (documentUrl) {
+                        window.open(documentUrl, '_blank');
+                      }
+                    }}
+                  >
+                    <FaEye className="w-5 h-5 text-primarycolor" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Tabs */}
           <div className="border-b border-gray-200 mb-6">
@@ -155,69 +364,161 @@ export default function DealDetail({ dealSlug }) {
 
           {/* Tab Content */}
           <div className="mb-8">
-            {activeTab === "Executive Summary" && (
+            {activeTab === "Summary" && (
               <div>
-                <h3 className="heading-section">Executive Summary</h3>
-                <p className="p-medium">{deal.executiveSummary}</p>
-              </div>
-            )}
-            {activeTab === "Investment Thesis" && (
-              <div>
-                <h3 className="heading-section">Investment Thesis</h3>
-                <p className="p-medium">{deal.thesis}</p>
-              </div>
-            )}
-            {activeTab === "Sector Overview" && (
-              <div>
-                <h3 className="heading-section">Sector Overview</h3>
-                <p className="p-medium">{deal.sectorOverview}</p>
+                <h3 className="heading-section">Summary</h3>
+                <p className="p-medium">{transformedDeal.summary}</p>
+                <div className="mt-6">
+                  <h4 className="heading-section text-lg">Full Description</h4>
+                  <p className="p-medium">{transformedDeal.full_description}</p>
+                </div>
               </div>
             )}
             {activeTab === "Deal Structure & Ticket Size" && (
               <div>
-                <h3 className="heading-section">Deal Structure & Ticket Size</h3>
-                <p className="p-medium">{deal.structure}</p>
+                {/* <h3 className="heading-section">Deal Structure & Ticket Size</h3> */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">Ticket Size</h4>
+                    <p className="p-medium">{transformedDeal.ticketSize}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">Expected IRR</h4>
+                    <p className="p-medium">{transformedDeal.expectedIrr}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">Timeline</h4>
+                    <p className="p-medium">{transformedDeal.timeline}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-gray-800 mb-2">Sector</h4>
+                    <p className="p-medium">{transformedDeal.sector}</p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Document Vault - Separate Section */}
-          <div className="border-t border-gray-200 pt-8">
-            <h2 className="heading-section mb-6">Document Vault</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {deal.documents.slice(1).map((doc) => (
-                <div key={doc.name} className="card-bordered hover:border-primarycolor transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="card-heading text-primarycolor">{doc.name}</p>
-                      <p className="card-paragraph">{doc.size}</p>
-                      <p className="text-xs text-secondary3 capitalize">{doc.type}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      {/* <button className="btn-icon-only">
-                        <FaRegEye className="w-5 h-5 text-primarycolor" />
-                      </button> */}
-                      <button className="btn-icon-only">
-                        <MdFileDownload className="w-5 h-5 text-primarycolor" />
-                      </button>
+          {/* Document Vault */}
+          {transformedDeal.dealCollateral && (
+            <div className="border-t border-gray-200 pt-8">
+              <h2 className="heading-section mb-6">Document Vault</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.entries(transformedDeal.dealCollateral).map(([type, document]) => (
+                  <div key={type} className="card-bordered hover:border-primarycolor transition-colors">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="card-heading text-primarycolor">{document.originalname}</p>
+                        <p className="card-paragraph">{(document.size / 1024 / 1024).toFixed(1)} MB</p>
+                        <p className="text-xs text-secondary3 capitalize">{type}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        {ndaSigned ? (
+                          <button 
+                            className="btn-icon-only"
+                            onClick={() => {
+                              const documentUrl = getDocumentUrl(document);
+                              if (documentUrl) {
+                                window.open(documentUrl, '_blank');
+                              }
+                            }}
+                          >
+                            <FaEye className="w-5 h-5 text-primarycolor" />
+                          </button>
+                        ) : (
+                          <button 
+                            className="btn-icon-only" 
+                            onClick={() => setShowNDAModal(true)}
+                            title="Sign NDA to view document"
+                          >
+                            <FaEye className="w-5 h-5 text-gray-400" />
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Bottom Sticky EOI */}
-      <div className="fixed bottom-0 left-0 right-0 bg-purple-50 border-t border-gray-200 p-4">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <p className="p-medium mb-0-override">Ready to invest in {deal.title}?</p>
-          <button className="btn-tertiary font-thin ">
-            Express Interest
-          </button>
+      {/* Bottom Sticky EOI - Only show if EOI not submitted */}
+      {!eoiSubmitted && (
+        <div className="sm:fixed bottom-0 left-0 right-0 bg-purple-50 border-t border-gray-200 p-4">
+          <div className="max-w-7xl mx-auto flex justify-between items-center">
+            <p className="p-medium mb-0-override">Ready to invest in {transformedDeal.title}?</p>
+            <button className="btn-tertiary font-thin " onClick={() => setShowEOIModal(true)}>
+              Express Interest
+            </button>
+          </div>
         </div>
-      </div>
+      )}
+
+      {showEOIModal && (
+        <EOIModal
+          show={showEOIModal}
+          onClose={() => setShowEOIModal(false)}
+          onSubmit={async (form) => {
+            setShowEOIModal(false);
+            setEoiForm(form);
+            setEoiSubmitted(true); // Update local state
+            setMsgType("success");
+            setMsgText("Your Expression of Interest has been submitted successfully.");
+            setShowMsg(true);
+            
+            // Refresh EOI status from backend
+            try {
+              const userData = localStorage.getItem('user');
+              if (userData) {
+                const user = JSON.parse(userData);
+                const investorId = user._id || user.id;
+                const eoiResponse = await checkEOIStatus(investorId, deal._id);
+                setEoiSubmitted(eoiResponse.result_info?.submitted || false);
+              }
+            } catch (error) {
+              console.error("Error refreshing EOI status:", error);
+            }
+          }}
+          dealTitle={transformedDeal.title}
+          dealId={deal._id}
+        />
+      )}
+      {showNDAModal && (
+        <NDAModal
+          show={showNDAModal}
+          onClose={() => setShowNDAModal(false)}
+          onSubmit={async () => {
+            setShowNDAModal(false);
+            setNdaSigned(true); // Update local state
+            setMsgType("success");
+            setMsgText("NDA Accepted. You can now download the document.");
+            setShowMsg(true);
+            
+            // Refresh NDA status from backend
+            try {
+              const userData = localStorage.getItem('user');
+              if (userData) {
+                const user = JSON.parse(userData);
+                const investorId = user._id || user.id;
+                const ndaResponse = await checkNDAStatus(investorId, deal._id);
+                setNdaSigned(ndaResponse.result_info?.is_signed || false);
+              }
+            } catch (error) {
+              console.error("Error refreshing NDA status:", error);
+            }
+          }}
+          dealTitle={transformedDeal.title}
+          dealId={deal._id}
+        />
+      )}
+      <ModalMessage
+        show={showMsg}
+        onClose={() => setShowMsg(false)}
+        type={msgType}
+        message={msgText}
+      />
     </div>
   );
 }

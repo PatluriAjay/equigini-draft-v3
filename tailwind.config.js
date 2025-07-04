@@ -65,6 +65,10 @@ module.exports = {
       keyframes: {},
 
       animation: {},
+      maxWidth: {
+        'xs': '24rem',
+        // ... you can add more custom max-widths here if needed ...
+      },
     },
   },
   plugins: [],
