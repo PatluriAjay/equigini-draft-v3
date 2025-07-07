@@ -17,7 +17,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['localhost', 'localhost:4000'], // Allow loading images from localhost
+    domains: ['images.unsplash.com', 'localhost'],
   },
   // async redirects() {
   //   return [
