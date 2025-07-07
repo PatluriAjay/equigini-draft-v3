@@ -81,7 +81,7 @@ export default function BlogListPage() {
 
   // Handle delete blog
   const handleDelete = async (id) => {
-    const blogToDelete = blogs.find(blog => blog.id === id);
+    const blogToDelete = blogs.find(blog => blog._id === id);
     setDeleteConfirmation({
       show: true,
       blogId: id,
@@ -131,7 +131,7 @@ export default function BlogListPage() {
         </div>
         <div className="bg-white rounded-lg p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading blogs...</p>
+          <p className="mt-2 text-gray-600">Loading...</p>
         </div>
       </div>
     );

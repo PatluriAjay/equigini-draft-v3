@@ -81,7 +81,7 @@ export default function TestimonialsPage() {
   };
 
   if (loading) {
-    return <Loader text="Loading testimonials..." />;
+    return <Loader text="Loading..." />;
   }
 
   if (error) {

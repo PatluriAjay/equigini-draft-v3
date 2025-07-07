@@ -7,32 +7,55 @@ const statusMap = {
   archived: 'badge bg-gray-200 text-gray-600',
 };
 
-export default function LegalDocsList({ docs = [] }) {
+export default function LegalDocsList({ ndaAgreements = [] }) {
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const handleViewPDF = (pdfPath) => {
+    if (pdfPath) {
+      window.open("http://localhost:4000/" + pdfPath, "_blank");
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="table-main">
         <thead className="table-header-row">
           <tr>
-            <th className="table-th">Type</th>
-            <th className="table-th">Deal</th>
-            <th className="table-th">Version</th>
-            <th className="table-th">Status</th>
+            <th className="table-th">Deal Name</th>
             <th className="table-th">Signed Date</th>
             <th className="table-th">Action</th>
           </tr>
         </thead>
         <tbody>
-          {docs.length === 0 && (
-            <tr><td colSpan={6} className="table-empty">No legal documents found.</td></tr>
+          {ndaAgreements.length === 0 && (
+            <tr><td colSpan={3} className="table-empty">No NDA agreements found.</td></tr>
           )}
-          {docs.map((doc, idx) => (
-            <tr key={idx} className="table-row">
-              <td className="table-td">{doc.type.toUpperCase()}</td>
-              <td className="table-td">{doc.deal}</td>
-              <td className="table-td">{doc.version}</td>
-              <td className="table-td"><span className={[doc.status]}>{doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}</span></td>
-              <td className="table-td">{doc.signed_date || '-'}</td>
-              <td className="table-td"><button className=""><IoMdEye size={20} color="" /></button></td>
+          {ndaAgreements.map((nda, idx) => (
+            <tr key={nda._id || idx} className="table-row">
+              <td className="table-td">{nda.deal_name}</td>
+              <td className="table-td">{formatDate(nda.signed_date)}</td>
+              <td className="table-td">
+                {nda.pdf_path && (
+                  <button 
+                    className="text-primarycolor hover:text-blue-700 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewPDF(nda.pdf_path);
+                    }}
+                    title="View PDF"
+                  >
+                    <IoMdEye size={20} />
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

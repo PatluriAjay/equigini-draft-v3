@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { approveInvestor, rejectInvestor } from '../../../services/api';
+import { approveInvestor, rejectInvestor, toggleInvestorActivation } from '../../../services/api';
 import ModalMessage from '../../investor/ModalMessage';
 
 const statusMap = {
@@ -17,6 +17,8 @@ export default function ProfileHeader({ investor, source = 'management', onStatu
   const [modalType, setModalType] = useState("success");
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const [showActivationModal, setShowActivationModal] = useState(false);
+  const [activationAction, setActivationAction] = useState(""); // "activate" or "deactivate"
 
   const handleApprove = async () => {
     try {
@@ -68,9 +70,38 @@ export default function ProfileHeader({ investor, source = 'management', onStatu
     handleReject(rejectReason);
   };
 
-  const handleDeactivate = () => {
-    // TODO: Implement deactivate functionality
-    console.log('Deactivating investor:', investor._id);
+  const handleActivationToggle = async () => {
+    try {
+      setProcessingAction(true);
+      const isActive = activationAction === "activate";
+      await toggleInvestorActivation(investor._id, isActive);
+      
+      const actionText = isActive ? "activated" : "deactivated";
+      setModalMessage(`Investor ${actionText} successfully!`);
+      setModalType("success");
+      setShowModal(true);
+      setShowActivationModal(false);
+      
+      // Call callback to refresh parent component
+      if (onStatusChange) {
+        onStatusChange();
+      }
+    } catch (error) {
+      setModalMessage(error.message || "Failed to toggle investor activation");
+      setModalType("error");
+      setShowModal(true);
+    } finally {
+      setProcessingAction(false);
+    }
+  };
+
+  const openActivationModal = (action) => {
+    setActivationAction(action);
+    setShowActivationModal(true);
+  };
+
+  const confirmActivation = () => {
+    handleActivationToggle();
   };
 
   return (
@@ -110,7 +141,13 @@ export default function ProfileHeader({ investor, source = 'management', onStatu
             </>
           )}
           {source === 'management' && (
-            <button className="btn-tertiary" onClick={handleDeactivate}>Deactivate</button>
+            <button 
+              className={`btn-tertiary ${investor.is_active ? 'bg-red-100 text-red-600 border-red-200' : 'bg-green-100 text-green-600 border-green-200'}`}
+              onClick={() => openActivationModal(investor.is_active ? "deactivate" : "activate")}
+              disabled={processingAction}
+            >
+              {processingAction ? "Processing..." : investor.is_active ? "Deactivate" : "Activate"}
+            </button>
           )}
         </div>
       </div>
@@ -121,6 +158,17 @@ export default function ProfileHeader({ investor, source = 'management', onStatu
         onClose={() => setShowModal(false)}
         type={modalType}
         message={modalMessage}
+      />
+
+      {/* Activation Confirmation Modal */}
+      <ModalMessage
+        show={showActivationModal}
+        onClose={() => setShowActivationModal(false)}
+        type="confirm"
+        message={`Are you sure you want to ${activationAction} ${investor?.full_name}? This action will ${activationAction === "activate" ? "allow" : "prevent"} the investor from accessing the platform.`}
+        onConfirm={confirmActivation}
+        confirmText={activationAction === "activate" ? "Activate" : "Deactivate"}
+        showCancel={true}
       />
 
       {/* Reject Reason Modal */}

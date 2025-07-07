@@ -71,7 +71,7 @@ export default function InvestorDashboardPage() {
     },
   ];
 
-  if (loading) return <Loader text="Loading dashboard..." />;
+  if (loading) return <Loader text="Loading..." />;
 
   return (
     <div className="flex flex-col gap-4 pb-6">

@@ -196,6 +196,51 @@ export const rejectInvestor = async (investorId, rejectionReason = "") => {
   }
 };
 
+// Toggle investor activation (activate/deactivate)
+export const toggleInvestorActivation = async (investorId, isActive) => {
+  try {
+    const response = await fetch(`${base_URL}toggleInvestorActivation/${investorId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ is_active: isActive }),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to toggle investor activation");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in toggleInvestorActivation:", error);
+    throw error;
+  }
+};
+
+// Delete investor
+export const deleteInvestor = async (investorId) => {
+  try {
+    const response = await fetch(`${base_URL}deleteInvestor/${investorId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to delete investor");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in deleteInvestor:", error);
+    throw error;
+  }
+};
+
 // Get all EOIs
 export const getAllEOIs = async () => {
   try {
@@ -277,6 +322,50 @@ export const getAllDeals = async () => {
     return result;
   } catch (error) {
     console.error("Error in getAllDeals:", error);
+    throw error;
+  }
+};
+
+// Get deal by ID
+export const getDealById = async (dealId) => {
+  try {
+    const response = await fetch(`${base_URL}getDealInfo/${dealId}`);
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to fetch deal");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in getDealById:", error);
+    throw error;
+  }
+};
+
+// Update deal
+export const updateDeal = async (dealId, dealData) => {
+  try {
+    let options = {
+      method: "PUT",
+    };
+    if (dealData instanceof FormData) {
+      // Do not set Content-Type header for FormData; browser will set it
+      options.body = dealData;
+    } else {
+      options.headers = { "Content-Type": "application/json" };
+      options.body = JSON.stringify(dealData);
+    }
+    const response = await fetch(`${base_URL}updateDeal/${dealId}`, options);
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to update deal");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in updateDeal:", error);
     throw error;
   }
 };
@@ -572,6 +661,33 @@ export const createBlog = async (data) => {
   }
 };
 
+// Save blog as draft
+export const saveBlogDraft = async (data) => {
+  try {
+    let options = {
+      method: "POST",
+    };
+    if (data instanceof FormData) {
+      // Do not set Content-Type header for FormData; browser will set it
+      options.body = data;
+    } else {
+      options.headers = { "Content-Type": "application/json" };
+      options.body = JSON.stringify(data);
+    }
+    const response = await fetch(`${base_URL}saveBlogDraft`, options);
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to save blog draft");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in saveBlogDraft:", error);
+    throw error;
+  }
+};
+
 export const updateBlog = async (blogId, data) => {
   try {
     let options = {
@@ -594,6 +710,27 @@ export const updateBlog = async (blogId, data) => {
     return result;
   } catch (error) {
     console.error("Error in updateBlog:", error);
+    throw error;
+  }
+};
+
+export const publishBlog = async (blogId) => {
+  try {
+    const response = await fetch(`${base_URL}publishBlog/${blogId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to publish blog");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in publishBlog:", error);
     throw error;
   }
 };
@@ -658,6 +795,258 @@ export const createTestimonial = async (data) => {
     return result;
   } catch (error) {
     console.error("Error in createTestimonial:", error);
+    throw error;
+  }
+};
+
+// Sector Management APIs
+export const createSector = async (sectorData) => {
+  try {
+    const response = await fetch(`${base_URL}createSector`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(sectorData),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to create sector");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in createSector:", error);
+    throw error;
+  }
+};
+
+export const updateSector = async (sectorId, sectorData) => {
+  try {
+    const response = await fetch(`${base_URL}updateSector/${sectorId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(sectorData),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to update sector");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in updateSector:", error);
+    throw error;
+  }
+};
+
+export const deleteSector = async (sectorId) => {
+  try {
+    const response = await fetch(`${base_URL}deleteSector/${sectorId}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to delete sector");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in deleteSector:", error);
+    throw error;
+  }
+};
+
+// Stage Management APIs
+export const createStage = async (stageData) => {
+  try {
+    const response = await fetch(`${base_URL}createStage`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(stageData),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to create stage");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in createStage:", error);
+    throw error;
+  }
+};
+
+export const updateStage = async (stageId, stageData) => {
+  try {
+    const response = await fetch(`${base_URL}updateStage/${stageId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(stageData),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to update stage");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in updateStage:", error);
+    throw error;
+  }
+};
+
+export const deleteStage = async (stageId) => {
+  try {
+    const response = await fetch(`${base_URL}deleteStage/${stageId}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to delete stage");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in deleteStage:", error);
+    throw error;
+  }
+};
+
+// Status Management APIs
+export const createStatus = async (statusData) => {
+  try {
+    const response = await fetch(`${base_URL}createStatus`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(statusData),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to create status");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in createStatus:", error);
+    throw error;
+  }
+};
+
+export const updateStatus = async (statusId, statusData) => {
+  try {
+    const response = await fetch(`${base_URL}updateStatus/${statusId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(statusData),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to update status");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in updateStatus:", error);
+    throw error;
+  }
+};
+
+export const deleteStatus = async (statusId) => {
+  try {
+    const response = await fetch(`${base_URL}deleteStatus/${statusId}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to delete status");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in deleteStatus:", error);
+    throw error;
+  }
+};
+
+// Ticket Size Management APIs
+export const createTicketSize = async (ticketSizeData) => {
+  try {
+    const response = await fetch(`${base_URL}createTicketSize`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ticketSizeData),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to create ticket size");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in createTicketSize:", error);
+    throw error;
+  }
+};
+
+export const updateTicketSize = async (ticketSizeId, ticketSizeData) => {
+  try {
+    const response = await fetch(`${base_URL}updateTicketSize/${ticketSizeId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(ticketSizeData),
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to update ticket size");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in updateTicketSize:", error);
+    throw error;
+  }
+};
+
+export const deleteTicketSize = async (ticketSizeId) => {
+  try {
+    const response = await fetch(`${base_URL}deleteTicketSize/${ticketSizeId}`, {
+      method: "DELETE",
+    });
+    const result = await response.json();
+    
+    if (result.status === "E") {
+      throw new Error(result.error_info || "Failed to delete ticket size");
+    }
+    
+    return result;
+  } catch (error) {
+    console.error("Error in deleteTicketSize:", error);
     throw error;
   }
 };

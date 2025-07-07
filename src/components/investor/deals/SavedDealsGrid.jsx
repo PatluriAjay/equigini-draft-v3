@@ -220,7 +220,7 @@ export default function SavedDealsGrid({
   };
 
   if (loading) {
-    return <Loader text="Loading saved deals..." />;
+    return <Loader text="Loading..." />;
   }
 
   if (error) {

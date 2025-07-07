@@ -20,6 +20,8 @@ export default function InvestorTable({
   onApprove,
   onReject,
   onDeactivate,
+  onToggleActivation,
+  onDeleteInvestor,
 }) {
   const router = useRouter();
 
@@ -51,6 +53,7 @@ export default function InvestorTable({
             <th className="table-th">EMAIL</th>
             <th className="table-th">TYPE</th>
             <th className="table-th">REGISTRATION DATE</th>
+            <th className="table-th">STATUS</th>
             <th className="table-th">ACTIONS</th>
           </tr>
         </thead>
@@ -77,7 +80,29 @@ export default function InvestorTable({
                 <td className="table-td">
                   {formatDate(inv.createdAt)}
                 </td>
-                <td className="table-td flex gap-2 items-center">
+                <td className="table-td">
+                  <div 
+                    className="flex items-center gap-3"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <label className="inline-flex items-center cursor-pointer">
+                      <input 
+                        type="checkbox" 
+                        className="sr-only peer"
+                        checked={inv.is_active}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          onToggleActivation(inv._id, !inv.is_active);
+                        }}
+                      />
+                      <div className="relative w-9 h-5 bg-gray-200 
+                      rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-primarycolor dark:peer-checked:bg-primarycolor"></div>
+                    </label>
+                  </div>
+                </td>
+                <td className="table-td flex gap-2 items-center"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <InvestorActions
                     status={inv.is_approved ? "Approved" : "Pending Review"}
                     onApprove={() => onApprove(inv._id)}
@@ -96,7 +121,14 @@ export default function InvestorTable({
                   >
                     <FaEdit size={20} color="" />
                   </button>
-                  <button className="btn-inline text-gray-700" title="Delete">
+                  <button 
+                    className="btn-inline text-gray-700" 
+                    title="Delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteInvestor(inv._id);
+                    }}
+                  >
                     <MdDelete size={20} color="" />
                   </button>
                 </td>
@@ -104,7 +136,7 @@ export default function InvestorTable({
             ))
           ) : (
             <tr>
-              <td colSpan={5} className="table-empty">
+              <td colSpan={6} className="table-empty">
                 No approved investors found.
               </td>
             </tr>

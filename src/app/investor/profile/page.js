@@ -95,7 +95,7 @@ export default function InvestorProfilePage() {
   };
 
   if (loading) {
-    return <Loader text="Loading profile..." />;
+    return <Loader text="Loading..." />;
   }
 
   if (error) {

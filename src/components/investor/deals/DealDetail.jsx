@@ -33,10 +33,24 @@ export default function DealDetail({ dealSlug }) {
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [bookmarkLoading, setBookmarkLoading] = useState(false);
 
+  // Check if there are any signed documents to show
+  const hasSignedDocuments = deal && (
+    (deal.eoi_submissions && deal.eoi_submissions.length > 0) ||
+    (deal.nda_agreements && deal.nda_agreements.length > 0)
+  );
+
   const tabSections = [
     { label: "Summary", key: "Summary" },
     { label: "Deal Structure & Ticket Size", key: "Deal Structure & Ticket Size" },
+    ...(hasSignedDocuments ? [{ label: "Signed Documents", key: "Signed Documents" }] : []),
   ];
+
+  // If current active tab is "Signed Documents" but there are no signed documents, switch to "Summary"
+  useEffect(() => {
+    if (activeTab === "Signed Documents" && !hasSignedDocuments) {
+      setActiveTab("Summary");
+    }
+  }, [hasSignedDocuments, activeTab]);
 
   // Get investor ID from localStorage
   const getInvestorId = () => {
@@ -149,7 +163,7 @@ export default function DealDetail({ dealSlug }) {
   }, [dealSlug]);
 
   if (loading) {
-    return <Loader text="Loading deal details..." />;
+    return <Loader text="Loading..." />;
   }
 
   if (error) {
@@ -192,6 +206,24 @@ export default function DealDetail({ dealSlug }) {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
     const cleanPath = documentData.path.replace(/\\/g, '/');
     return `${baseUrl}/${cleanPath}`;
+  };
+
+  // Helper function to construct signed document URL
+  const getSignedDocumentUrl = (pdfPath) => {
+    if (!pdfPath) return null;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const cleanPath = pdfPath.replace(/\\/g, '/');
+    return `${baseUrl}/${cleanPath}`;
+  };
+
+  // Helper function to format date in DD-MM-YYYY format
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
   };
 
   // Transform backend data to frontend format
@@ -395,6 +427,92 @@ export default function DealDetail({ dealSlug }) {
                     <p className="p-medium">{transformedDeal.sector}</p>
                   </div>
                 </div>
+              </div>
+            )}
+            {activeTab === "Signed Documents" && (
+              <div>
+                <h3 className="heading-section mb-6">Signed Documents</h3>
+                
+                {/* Combined Documents Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* EOI Documents */}
+                  {deal.eoi_submissions && deal.eoi_submissions.map((eoi, index) => (
+                    <div key={`eoi-${eoi._id || index}`} className="card-bordered hover:border-primarycolor transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="card-heading text-primarycolor">EOI Submission</p>
+                                                        <p className="card-paragraph text-sm">
+                                Submitted on: {formatDate(eoi.createdAt)}
+                              </p>
+                          {/* <p className="text-xs text-secondary3">
+                            Status: {eoi.is_approved ? 'Approved' : 'Pending'}
+                          </p> */}
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            className="btn-icon-only"
+                            onClick={() => {
+                              const documentUrl = getSignedDocumentUrl(eoi.pdf_path);
+                              if (documentUrl) {
+                                window.open(documentUrl, '_blank');
+                              }
+                            }}
+                            title="View EOI Document"
+                          >
+                            <FaEye className="w-5 h-5 text-primarycolor" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* NDA Documents */}
+                  {deal.nda_agreements && deal.nda_agreements.map((nda, index) => (
+                    <div key={`nda-${nda._id || index}`} className="card-bordered hover:border-primarycolor transition-colors">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="card-heading text-primarycolor">NDA Agreement</p>
+                                                        <p className="card-paragraph text-sm">
+                                Signed on: {formatDate(nda.signed_date)}
+                              </p>
+                          {/* <p className="text-xs text-secondary3">
+                            Status: {nda.nda_signed ? 'Signed' : 'Pending'}
+                          </p> */}
+                        </div>
+                        <div className="flex gap-2">
+                          <button 
+                            className="btn-icon-only"
+                            onClick={() => {
+                              const documentUrl = getSignedDocumentUrl(nda.pdf_path);
+                              if (documentUrl) {
+                                window.open(documentUrl, '_blank');
+                              }
+                            }}
+                            title="View NDA Document"
+                          >
+                            <FaEye className="w-5 h-5 text-primarycolor" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Show message if no signed documents */}
+                {(!deal.eoi_submissions || deal.eoi_submissions.length === 0) && 
+                 (!deal.nda_agreements || deal.nda_agreements.length === 0) && (
+                  <div className="text-center py-8">
+                    <div className="text-gray-500 mb-2">
+                      <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-600">No signed documents available yet.</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                      Submit an EOI or sign an NDA to see your documents here.
+                    </p>
+                  </div>
+                )}
               </div>
             )}
           </div>

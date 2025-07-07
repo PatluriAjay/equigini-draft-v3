@@ -4,7 +4,7 @@ import Image from "next/image";
 
 export default function AuthNavbar({ rightText = "Already have an account?", rightLink = "/login", rightLinkText = "Sign In" }) {
   return (
-    <nav className="w-full flex items-center justify-between px-2 py-4 border-b border-bordercolor bg-white ">
+    <nav className="w-full flex items-center justify-between px-2 py-4 border-b border-bordercolor bg-white h-[10vh] ">
       <div className="flex items-center gap-2">
           <Image
             src="/equigini-logo.webp"

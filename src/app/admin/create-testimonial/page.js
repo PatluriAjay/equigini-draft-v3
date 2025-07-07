@@ -5,6 +5,7 @@ import { createTestimonial } from "@/services/api";
 import ModalMessage from "@/components/investor/ModalMessage";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import Link from "next/link";
 
 export default function CreateTestimonialPage() {
   const router = useRouter();
@@ -107,6 +108,15 @@ export default function CreateTestimonialPage() {
 
   return (
     <div className="flex flex-col gap-5">
+      <div>
+        <nav className="flex items-center space-x-2 text-gray-600 mb-4">
+          <Link href="/admin" className="hover:underline">Home</Link>
+          <span className="text-gray-400">{">"}</span>
+          <Link href="/admin/testimonials" className="hover:underline">Testimonials</Link>
+          <span className="text-gray-400">{">"}</span>
+          <span className="font-semibold">Create Testimonial</span>
+        </nav>
+      </div>
       <div className="flex justify-between items-center gap-2">
         <h1 className="heading-main">Create testimonial</h1>
       </div>

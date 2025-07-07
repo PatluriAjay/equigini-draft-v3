@@ -64,10 +64,9 @@ export default function RegisterPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [step, setStep] = useState(0);
-  const [error, setError] = useState("");
+  const [modalMessage, setModalMessage] = useState({ show: false, type: "success", message: "" });
   const [agree, setAgree] = useState(false);
   const [showPasswordStep, setShowPasswordStep] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [dropdownOptions, setDropdownOptions] = useState({
     sectors: [],
     investmentRanges: [],
@@ -144,39 +143,39 @@ export default function RegisterPage() {
   const validateStep = () => {
     if (step === 0) {
       if (!form.fullName || !form.email || !form.mobile) {
-        setError("Please fill all required fields.");
+        setModalMessage({ show: true, type: "error", message: "Please fill all required fields." });
         return false;
       }
     } else if (step === 1) {
       if (!form.investmentRange || !form.sectors || form.sectors.length === 0) {
-        setError("Please fill all required fields.");
+        setModalMessage({ show: true, type: "error", message: "Please fill all required fields." });
         return false;
       }
     } // Step 2: all fields optional
     else if (step === 3) {
       if (form.otp.some((d) => !d)) {
-        setError("Please enter the 6-digit OTP sent to your email.");
+        setModalMessage({ show: true, type: "error", message: "Please enter the 6-digit OTP sent to your email." });
         return false;
       }
     }
-    setError("");
+    setModalMessage({ show: false, type: "success", message: "" });
     return true;
   };
 
   const validatePasswordStep = () => {
     if (!form.password || !form.confirmPassword) {
-      setError("Please fill all required fields.");
+      setModalMessage({ show: true, type: "error", message: "Please fill all required fields." });
       return false;
     }
     if (form.password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+      setModalMessage({ show: true, type: "error", message: "Password must be at least 6 characters long." });
       return false;
     }
     if (form.password !== form.confirmPassword) {
-      setError("Passwords do not match.");
+      setModalMessage({ show: true, type: "error", message: "Passwords do not match." });
       return false;
     }
-    setError("");
+    setModalMessage({ show: false, type: "success", message: "" });
     return true;
   };
 
@@ -196,7 +195,7 @@ export default function RegisterPage() {
     if (!validatePasswordStep()) return;
     
     setSubmitting(true);
-    setError("");
+    setModalMessage({ show: false, type: "success", message: "" });
     
     // Debug: Log current form state
     console.log("Current form state:", form);
@@ -233,22 +232,28 @@ export default function RegisterPage() {
       const registrationResult = await registerInvestor(investorData);
       
       if (registrationResult.status === "S") {
-        // Show success message first
-        setShowSuccessMessage(true);
-        // Redirect to login page after 2 seconds
-        setTimeout(() => {
-          router.push("/login");
-        }, 2000);
+        // Show success message
+        setModalMessage({ show: true, type: "success", message: "Account created successfully! Click close to continue to login page." });
+      } else {
+        // Handle API error responses (like email already exists)
+        const errorMessage = registrationResult.error_info || registrationResult.message || "Registration failed. Please try again.";
+        setModalMessage({ show: true, type: "error", message: errorMessage });
       }
     } catch (error) {
-      setError(error.message || "Registration failed. Please try again.");
+      console.log("Caught error:", error);
+      console.log("Error message:", error.message);
+      setModalMessage({ show: true, type: "error", message: error.message || "Registration failed. Please try again." });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleBack = () => {
-    if (step > 0) setStep(step - 1);
+    if (step > 0) {
+      setStep(step - 1);
+      // Clear any existing modal messages when going back
+      setModalMessage({ show: false, type: "success", message: "" });
+    }
   };
 
   const handleCancel = () => {
@@ -299,15 +304,17 @@ export default function RegisterPage() {
                   onChange={handleChange}
                   required
                 />
-              </div>
-              
-              {error && <div className="text-red-600 p-small">{error}</div>}
-              
-              <div className="flex gap-4">
+                              </div>
+                
+                <div className="flex gap-4">
                 <button
                   className="btn-secondary flex-1"
                   type="button"
-                  onClick={() => setShowPasswordStep(false)}
+                  onClick={() => {
+                    setShowPasswordStep(false);
+                    // Clear any existing modal messages when going back
+                    setModalMessage({ show: false, type: "success", message: "" });
+                  }}
                 >
                   Back
                 </button>
@@ -325,12 +332,18 @@ export default function RegisterPage() {
           </div>
         </div>
         
-        {/* Success Message Modal */}
+        {/* Modal Message */}
         <ModalMessage
-          show={showSuccessMessage}
-          onClose={() => setShowSuccessMessage(false)}
-          type="success"
-          message="Account created successfully! Redirecting to login page..."
+          show={modalMessage.show}
+          type={modalMessage.type}
+          message={modalMessage.message}
+          onClose={() => {
+            setModalMessage({ show: false, type: "success", message: "" });
+            // Redirect when user clicks close on success modal
+            if (modalMessage.type === "success" && modalMessage.message.includes("Account created successfully")) {
+              router.push("/login");
+            }
+          }}
         />
       </div>
     );
@@ -488,7 +501,7 @@ export default function RegisterPage() {
                       value={form.investmentRange}
                       onChange={(option) => handleSelectChange(option, { name: "investmentRange" })}
                       options={dropdownOptions.investmentRanges}
-                      placeholder={loading ? "Loading investment ranges..." : "Select investment range"}
+                      placeholder={loading ? "Loading..." : "Select investment range"}
                       className="react-select-container"
                       classNamePrefix="react-select"
                       isClearable
@@ -504,7 +517,7 @@ export default function RegisterPage() {
                       value={form.sectors}
                       onChange={(option) => handleSelectChange(option, { name: "sectors" })}
                       options={dropdownOptions.sectors}
-                      placeholder={loading ? "Loading sectors..." : "Select preferred sectors"}
+                      placeholder={loading ? "Loading..." : "Select preferred sectors"}
                       className="react-select-container"
                       classNamePrefix="react-select"
                       isMulti
@@ -655,9 +668,8 @@ export default function RegisterPage() {
                   ))}
                 </div>
               </div>
-            )}
-            {error && <div className="text-red-600 p-small">{error}</div>}
-            <div className="flex gap-4 mt-6">
+                          )}
+              <div className="flex gap-4 mt-6">
               {step > 0 && (
                 <button
                   className="btn-secondary flex-1"
@@ -696,12 +708,18 @@ export default function RegisterPage() {
         </div>
       </div>
       
-      {/* Success Message Modal */}
+      {/* Modal Message */}
       <ModalMessage
-        show={showSuccessMessage}
-        onClose={() => setShowSuccessMessage(false)}
-        type="success"
-        message="Account created successfully! Redirecting to login page..."
+        show={modalMessage.show}
+        type={modalMessage.type}
+        message={modalMessage.message}
+        onClose={() => {
+          setModalMessage({ show: false, type: "success", message: "" });
+          // Redirect when user clicks close on success modal
+          if (modalMessage.type === "success" && modalMessage.message.includes("Account created successfully")) {
+            router.push("/login");
+          }
+        }}
       />
     </div>
   );

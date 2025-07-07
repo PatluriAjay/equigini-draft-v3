@@ -51,7 +51,7 @@ export default function DealsFilterBar({
       <div className="flex md:hidden w-full items-center justify-between gap-2 mb-3">
         <input
           type="text"
-          placeholder="Search by deal title..."
+          placeholder="Search..."
           className="search-input w-full max-w-[70%]"
           value={searchTerm}
           onChange={handleSearchChange}
@@ -69,7 +69,7 @@ export default function DealsFilterBar({
         <div className="flex-shrink-0">
           <input
             type="text"
-            placeholder="Search by deal title..."
+            placeholder="Search..."
             className="search-input w-72"
             value={searchTerm}
             onChange={handleSearchChange}

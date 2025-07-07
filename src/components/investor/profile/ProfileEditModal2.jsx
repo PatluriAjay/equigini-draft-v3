@@ -236,7 +236,7 @@ export default function ProfileEditModal2({ isOpen, onClose, investor, onUpdate,
                   value={formData.investment_range}
                   onChange={(option) => handleSelectChange(option, { name: "investment_range" })}
                   options={dropdownOptions.investmentRanges}
-                  placeholder={optionsLoading ? "Loading investment ranges..." : "Select investment range"}
+                  placeholder={optionsLoading ? "Loading..." : "Select investment range"}
                   className="react-select-container"
                   classNamePrefix="react-select"
                   isClearable
@@ -266,7 +266,7 @@ export default function ProfileEditModal2({ isOpen, onClose, investor, onUpdate,
                   value={formData.preferred_sectors}
                   onChange={(option) => handleSelectChange(option, { name: "preferred_sectors" })}
                   options={dropdownOptions.sectors}
-                  placeholder={optionsLoading ? "Loading sectors..." : "Select preferred sectors"}
+                  placeholder={optionsLoading ? "Loading..." : "Select preferred sectors"}
                   className="react-select-container"
                   classNamePrefix="react-select"
                   isMulti

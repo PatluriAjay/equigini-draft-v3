@@ -7,6 +7,7 @@ import { DealIconMap } from "./dealIcons";
 import { getAllDeals, getAllEOIs, toggleDealInWatchlist, isDealInWatchlist } from "../../../services/api";
 import Link from "next/link";
 import Loader from "../../common/Loader";
+import { usePathname } from "next/navigation";
 
 export default function DealsGrid({ 
   maxDeals, 
@@ -26,6 +27,10 @@ export default function DealsGrid({
   const [eoiStatus, setEoiStatus] = useState({});
   const [bookmarkStatus, setBookmarkStatus] = useState({});
   const [bookmarkLoading, setBookmarkLoading] = useState({});
+  const pathname = usePathname();
+
+  // Check if we're on the dashboard page
+  const isDashboardPage = pathname === "/investor/dashboard";
 
   // Get investor ID from localStorage
   const getInvestorId = () => {
@@ -61,36 +66,38 @@ export default function DealsGrid({
       if (dealsResponse.result_info) {
         setDeals(dealsResponse.result_info);
         
-        // Check bookmark status for all deals
-        const investorId = getInvestorId();
-        if (investorId) {
-          const bookmarkMap = {};
-          const loadingMap = {};
-          
-          dealsResponse.result_info.forEach(deal => {
-            bookmarkMap[deal._id] = false;
-            loadingMap[deal._id] = false;
-          });
-          
-          setBookmarkStatus(bookmarkMap);
-          setBookmarkLoading(loadingMap);
-          
-          // Check bookmark status for each deal
-          await Promise.all(
-            dealsResponse.result_info.map(async (deal) => {
-              try {
-                const result = await isDealInWatchlist(investorId, deal._id);
-                if (result.status === "S") {
-                  setBookmarkStatus(prev => ({
-                    ...prev,
-                    [deal._id]: result.result_info.is_in_watchlist
-                  }));
+        // Check bookmark status for all deals only on dashboard page
+        if (isDashboardPage) {
+          const investorId = getInvestorId();
+          if (investorId) {
+            const bookmarkMap = {};
+            const loadingMap = {};
+            
+            dealsResponse.result_info.forEach(deal => {
+              bookmarkMap[deal._id] = false;
+              loadingMap[deal._id] = false;
+            });
+            
+            setBookmarkStatus(bookmarkMap);
+            setBookmarkLoading(loadingMap);
+            
+            // Check bookmark status for each deal
+            await Promise.all(
+              dealsResponse.result_info.map(async (deal) => {
+                try {
+                  const result = await isDealInWatchlist(investorId, deal._id);
+                  if (result.status === "S") {
+                    setBookmarkStatus(prev => ({
+                      ...prev,
+                      [deal._id]: result.result_info.is_in_watchlist
+                    }));
+                  }
+                } catch (error) {
+                  console.error(`Error checking bookmark status for deal ${deal._id}:`, error);
                 }
-              } catch (error) {
-                console.error(`Error checking bookmark status for deal ${deal._id}:`, error);
-              }
-            })
-          );
+              })
+            );
+          }
         }
       }
       
@@ -245,7 +252,7 @@ export default function DealsGrid({
   const gridCols = layout === "compact" ? "lg:grid-cols-3" : "lg:grid-cols-4";
 
   if (loading) {
-    return <Loader text="Loading deals..." />;
+    return <Loader text="Loading..." />;
   }
 
   if (error) {
@@ -332,25 +339,27 @@ export default function DealsGrid({
                     alt={deal.name}
                     className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
                   />
-                  {/* Bookmark Button - Bottom Right */}
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleBookmarkToggle(deal.id, e);
-                    }}
-                    disabled={bookmarkLoading[deal.id]}
-                    className="absolute bottom-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all duration-200 disabled:opacity-50 z-10"
-                    title={bookmarkStatus[deal.id] ? "Remove from bookmarks" : "Add to bookmarks"}
-                  >
-                    {bookmarkLoading[deal.id] ? (
-                      <div className="w-4 h-4 border-2 border-primarycolor border-t-transparent rounded-full animate-spin"></div>
-                    ) : bookmarkStatus[deal.id] ? (
-                      <GoBookmarkFill className="w-4 h-4 text-primarycolor" />
-                    ) : (
-                      <GoBookmark className="w-4 h-4 text-gray-600 hover:text-primarycolor" />
-                    )}
-                  </button>
+                  {/* Bookmark Button - Only show on dashboard page */}
+                  {isDashboardPage && (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleBookmarkToggle(deal.id, e);
+                      }}
+                      disabled={bookmarkLoading[deal.id]}
+                      className="absolute bottom-2 right-2 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all duration-200 disabled:opacity-50 z-10"
+                      title={bookmarkStatus[deal.id] ? "Remove from bookmarks" : "Add to bookmarks"}
+                    >
+                      {bookmarkLoading[deal.id] ? (
+                        <div className="w-4 h-4 border-2 border-primarycolor border-t-transparent rounded-full animate-spin"></div>
+                      ) : bookmarkStatus[deal.id] ? (
+                        <GoBookmarkFill className="w-4 h-4 text-primarycolor" />
+                      ) : (
+                        <GoBookmark className="w-4 h-4 text-gray-600 hover:text-primarycolor" />
+                      )}
+                    </button>
+                  )}
                 </div>
                 {/* Icon, Title, Status Row */}
                 <div className="flex items-center gap-3 mb-2 px-4">

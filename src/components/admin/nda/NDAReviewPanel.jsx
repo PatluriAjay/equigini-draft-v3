@@ -2,8 +2,11 @@
 import React, { useState, useEffect } from "react";
 import ModalMessage from "@/components/investor/ModalMessage";
 import Pagination from "@/components/common/Pagination";
+import Loader from "@/components/common/Loader";
 import { getAllSignedNDAs } from "../../../services/api";
 import { FaEye } from "react-icons/fa";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 export default function NDAReviewPanel() {
   const [ndas, setNdas] = useState([]);
@@ -14,6 +17,7 @@ export default function NDAReviewPanel() {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [showError, setShowError] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [pdfLoading, setPdfLoading] = useState({});
 
   // Fetch NDA agreements on component mount
   useEffect(() => {
@@ -26,6 +30,8 @@ export default function NDAReviewPanel() {
       const response = await getAllSignedNDAs();
       if (response.result_info && response.result_info.signed_agreements) {
         setNdas(response.result_info.signed_agreements);
+        console.log( response.result_info.signed_agreements);
+        console.log(response.result_info.signed_agreements[0]?.pdf_content);
       } else {
         setNdas([]);
       }
@@ -50,6 +56,213 @@ export default function NDAReviewPanel() {
     const year = date.getFullYear();
     
     return `${day}-${month}-${year}`;
+  };
+
+  // Generate PDF from NDA HTML content
+  const generatePDF = async (nda) => {
+    if (!nda.pdf_content) {
+      setErrorMessage("No PDF content available for this NDA");
+      setShowError(true);
+      return;
+    }
+
+    try {
+      // Parse the HTML content to extract sections
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(nda.pdf_content, 'text/html');
+      
+      // Helper to get next tag of a certain type
+      function getNextTag(el, tagName) {
+        let next = el?.nextSibling;
+        while (next) {
+          if (next.nodeType === 1 && next.tagName.toLowerCase() === tagName.toLowerCase()) return next;
+          next = next.nextSibling;
+        }
+        return null;
+      }
+      // Extract deal details table
+      const dealDetailsSection = Array.from(doc.querySelectorAll('h2')).find(h2 => h2.textContent.includes('Deal Details'));
+      const dealDetailsTable = getNextTag(dealDetailsSection, 'table');
+      // Extract investor details table
+      const investorDetailsSection = Array.from(doc.querySelectorAll('h2')).find(h2 => h2.textContent.includes('Investor Details'));
+      const investorDetailsTable = getNextTag(investorDetailsSection, 'table');
+      // Extract agreement content
+      const agreementSection = Array.from(doc.querySelectorAll('h2')).find(h2 => h2.textContent.includes('Agreement Content'));
+      const agreementContent = getNextTag(agreementSection, 'div');
+
+      // Create separate containers for each page
+      const page1Container = document.createElement('div');
+      const page2Container = document.createElement('div');
+      const page3Container = document.createElement('div');
+
+      // Page 1: Deal Details
+      page1Container.innerHTML = `
+        <div style="page-break-after: always;">
+          <h1 style="text-align: center; color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 30px;">
+            NON-DISCLOSURE AGREEMENT
+          </h1>
+          <h2 style="color: #34495e; margin-top: 30px; margin-bottom: 15px; border-left: 4px solid #3498db; padding-left: 10px;">
+            Deal Details
+          </h2>
+          ${dealDetailsTable?.outerHTML || ''}
+        </div>
+      `;
+
+      // Page 2: Investor Details
+      page2Container.innerHTML = `
+        <div style="page-break-after: always;">
+          <h2 style="color: #34495e; margin-top: 30px; margin-bottom: 15px; border-left: 4px solid #3498db; padding-left: 10px;">
+            Investor Details
+          </h2>
+          ${investorDetailsTable?.outerHTML || ''}
+        </div>
+      `;
+
+      // Page 3+: Agreement Content
+      page3Container.innerHTML = `
+        <div>
+          <h2 style="color: #34495e; margin-top: 30px; margin-bottom: 15px; border-left: 4px solid #3498db; padding-left: 10px;">
+            Agreement Content
+          </h2>
+          ${agreementContent?.innerHTML || ''}
+        </div>
+      `;
+
+      // Add CSS styling for better PDF output
+      const style = document.createElement('style');
+      style.textContent = `
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          margin: 0;
+          padding: 20px;
+        }
+        h1 {
+          color: #2c3e50;
+          text-align: center;
+          border-bottom: 2px solid #3498db;
+          padding-bottom: 10px;
+          margin-bottom: 30px;
+        }
+        h2 {
+          color: #34495e;
+          margin-top: 30px;
+          margin-bottom: 15px;
+          border-left: 4px solid #3498db;
+          padding-left: 10px;
+        }
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 15px 0;
+        }
+        th, td {
+          border: 1px solid #ddd;
+          padding: 12px;
+          text-align: left;
+        }
+        th {
+          background-color: #f8f9fa;
+          font-weight: bold;
+          color: #2c3e50;
+        }
+        p {
+          margin: 10px 0;
+          text-align: justify;
+        }
+        ol, ul {
+          margin: 10px 0;
+          padding-left: 20px;
+        }
+        li {
+          margin: 5px 0;
+        }
+        strong {
+          color: #2c3e50;
+        }
+        small {
+          color: #7f8c8d;
+          font-style: italic;
+        }
+        @media print {
+          .page-break { page-break-after: always; }
+        }
+      `;
+
+      // Create main container with all pages
+      const mainContainer = document.createElement('div');
+      mainContainer.appendChild(style);
+      // Add a wrapper with padding for all content
+      const paddedWrapper = document.createElement('div');
+      paddedWrapper.style.padding = '32px';
+      paddedWrapper.style.background = 'white';
+      paddedWrapper.appendChild(page1Container);
+      paddedWrapper.appendChild(page2Container);
+      paddedWrapper.appendChild(page3Container);
+      mainContainer.appendChild(paddedWrapper);
+      mainContainer.style.position = 'absolute';
+      mainContainer.style.left = '-9999px';
+      mainContainer.style.top = '-9999px';
+      mainContainer.style.width = '800px';
+      mainContainer.style.backgroundColor = 'white';
+      document.body.appendChild(mainContainer);
+
+      // Convert HTML to canvas using html2canvas
+      const canvas = await html2canvas(mainContainer, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        backgroundColor: '#ffffff',
+        width: 800,
+        height: mainContainer.scrollHeight
+      });
+
+      // Calculate PDF dimensions
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 295; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      let position = 0;
+
+      // Add image to PDF
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add new pages if content is longer than one page
+      while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Generate PDF blob and open in new tab
+      const pdfBlob = pdf.output('blob');
+      const blobUrl = URL.createObjectURL(pdfBlob);
+      const newWindow = window.open(blobUrl, '_blank');
+      
+      if (!newWindow) {
+        setErrorMessage("Popup blocked. Please allow popups for this site to view the PDF.");
+        setShowError(true);
+      }
+
+      // Clean up blob URL after a delay
+      setTimeout(() => {
+        URL.revokeObjectURL(blobUrl);
+      }, 1000);
+
+      // Clean up temporary container
+      document.body.removeChild(mainContainer);
+      
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      setErrorMessage("Failed to generate PDF. Please try again.");
+      setShowError(true);
+    }
   };
 
   function filteredNdas() {
@@ -103,7 +316,11 @@ export default function NDAReviewPanel() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading NDA agreements...</div>
+        <Loader 
+          text="Loading..." 
+          size="large" 
+          showBackground={true}
+        />
       </div>
     );
   }
@@ -170,18 +387,16 @@ export default function NDAReviewPanel() {
                   {nda.investor_mobile || "N/A"}
                 </td>
                 <td className="table-td whitespace-nowrap ">
-                  {nda.pdf_path && (
-                    <button
-                      className="text-primarycolor hover:text-blue-700"
-                      title="View PDF"
-                      onClick={e => {
-                        e.stopPropagation();
-                        window.open("http://localhost:4000/" + nda.pdf_path, "_blank");
-                      }}
-                    >
-                      <FaEye className="w-5 h-5" />
-                    </button>
-                  )}
+                  <button
+                    className="text-primarycolor hover:text-blue-700 transition-colors"
+                    title="Generate PDF"
+                    onClick={e => {
+                      e.stopPropagation();
+                      generatePDF(nda);
+                    }}
+                  >
+                    <FaEye className="w-5 h-5" />
+                  </button>
                 </td>
               </tr>
             ))}

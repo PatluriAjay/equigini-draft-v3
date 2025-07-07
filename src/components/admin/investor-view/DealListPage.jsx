@@ -2,9 +2,11 @@
 import DealFilters from "./DealFilters";
 import DealTable from "./DealTable";
 import Pagination from "@/components/common/Pagination";
+import ModalMessage from "@/components/investor/ModalMessage";
 import Link from "next/link";
 import { useState, useEffect, useMemo } from "react";
-import { getAllDeals } from "@/services/api";
+import { getAllDeals, deleteDeal } from "@/services/api";
+import { useRouter } from "next/navigation";
 
 export default function DealListPage() {
   const [deals, setDeals] = useState([]);
@@ -13,6 +15,9 @@ export default function DealListPage() {
   const [searchValue, setSearchValue] = useState("");
   const [page, setPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [message, setMessage] = useState({ show: false, type: "success", text: "" });
+  const [confirmDelete, setConfirmDelete] = useState({ show: false, dealId: null });
+  const router = useRouter();
 
   useEffect(() => {
     const fetchDeals = async () => {
@@ -76,14 +81,36 @@ export default function DealListPage() {
   // Placeholder for stats
   const stats = {};
 
-  // Placeholder handlers
+  // Handlers
   const onEdit = (id) => {
-    // Navigate to edit page
-    window.location.href = `/admin/edit-deal/${id}`;
+    // Navigate to edit page using Next.js router
+    router.push(`/admin/edit-deal/${id}`);
   };
 
-  const onArchive = (id) => {
-    // No longer needed
+  const onDelete = (id) => {
+    setConfirmDelete({ show: true, dealId: id });
+  };
+
+  const handleConfirmDelete = async () => {
+    const dealId = confirmDelete.dealId;
+    setConfirmDelete({ show: false, dealId: null });
+    
+    try {
+      const response = await deleteDeal(dealId);
+      if (response.status === "S") {
+        // Refresh the deals list
+        const updatedResponse = await getAllDeals();
+        if (updatedResponse.status === "S" && updatedResponse.result_info) {
+          setDeals(updatedResponse.result_info);
+        }
+        setMessage({ show: true, type: "success", text: "Deal deleted successfully!" });
+      } else {
+        setMessage({ show: true, type: "error", text: "Failed to delete deal: " + (response.error_info || "Unknown error") });
+      }
+    } catch (error) {
+      console.error("Error deleting deal:", error);
+      setMessage({ show: true, type: "error", text: "Error deleting deal: " + error.message });
+    }
   };
 
   const onStatusChange = (id, status) => {};
@@ -99,33 +126,11 @@ export default function DealListPage() {
         </div>
         <div className="bg-white rounded-lg p-8 text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading deals...</p>
+          <p className="mt-2 text-gray-600">Loading...</p>
         </div>
       </div>
     );
   }
-
-  // if (error) {
-  //   return (
-  //     <div className="flex flex-col gap-5">
-  //       <div className="flex justify-between items-center gap-2">
-  //         <h1 className="heading-main">Deal Management</h1>
-  //         <Link href="/admin/create-deal" className="btn-primary">
-  //           + Create Deal
-  //         </Link>
-  //       </div>
-  //       <div className="bg-white rounded-lg p-8 text-center">
-  //         <p className="text-red-600 mb-4">Error: {error}</p>
-  //         <button 
-  //           onClick={() => window.location.reload()} 
-  //           className="btn-primary"
-  //         >
-  //           Retry
-  //         </button>
-  //       </div>
-  //     </div>
-  //   );
-  // }
 
   return (
     <div className="flex flex-col gap-5">
@@ -149,7 +154,7 @@ export default function DealListPage() {
         <DealTable
           deals={paginatedDeals}
           onEdit={onEdit}
-          onArchive={onArchive}
+          onDelete={onDelete}
           onStatusChange={onStatusChange}
         />
       </div>
@@ -164,6 +169,25 @@ export default function DealListPage() {
           itemsPerPage={itemsPerPage}
         />
       </div>
+
+      {/* Success/Error Message Modal */}
+      <ModalMessage
+        show={message.show}
+        type={message.type}
+        message={message.text}
+        onClose={() => setMessage({ show: false, type: "success", text: "" })}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ModalMessage
+        show={confirmDelete.show}
+        type="confirm"
+        message="Are you sure you want to delete this deal"
+        onClose={() => setConfirmDelete({ show: false, dealId: null })}
+        onConfirm={handleConfirmDelete}
+        confirmText="Delete"
+        showCancel={true}
+      />
     </div>
   );
 }

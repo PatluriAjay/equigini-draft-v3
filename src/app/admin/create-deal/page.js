@@ -527,7 +527,7 @@ export default function CreateDealPage() {
                   onChange={(opt) =>
                     setForm((f) => ({ ...f, sector: opt ? opt.value : "" }))
                   }
-                  placeholder={isLoading ? "Loading sectors..." : "Select Sector"}
+                  placeholder={isLoading ? "Loading..." : "Select Sector"}
                   styles={reactSelectStyles}
                   isLoading={isLoading}
                   isDisabled={isLoading}
@@ -545,7 +545,7 @@ export default function CreateDealPage() {
                   onChange={(opt) =>
                     setForm((f) => ({ ...f, stage: opt ? opt.value : "" }))
                   }
-                  placeholder={isLoading ? "Loading stages..." : "Select Stage"}
+                  placeholder={isLoading ? "Loading..." : "Select Stage"}
                   styles={reactSelectStyles}
                   isLoading={isLoading}
                   isDisabled={isLoading}
@@ -582,7 +582,7 @@ export default function CreateDealPage() {
                   onChange={(opt) =>
                     setStep2((s) => ({ ...s, ticketSize: opt ? opt.value : "" }))
                   }
-                  placeholder={isLoading ? "Loading ticket sizes..." : "Select Range"}
+                  placeholder={isLoading ? "Loading..." : "Select Range"}
                   styles={reactSelectStyles}
                   isLoading={isLoading}
                   isDisabled={isLoading}
@@ -598,7 +598,7 @@ export default function CreateDealPage() {
                   onChange={(opt) =>
                     setStep2((s) => ({ ...s, status: opt ? opt.value : "" }))
                   }
-                  placeholder={isLoading ? "Loading statuses..." : "Select Status"}
+                  placeholder={isLoading ? "Loading..." : "Select Status"}
                   styles={reactSelectStyles}
                   isLoading={isLoading}
                   isDisabled={isLoading}

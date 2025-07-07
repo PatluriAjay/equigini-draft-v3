@@ -187,7 +187,7 @@ const InvestorApproval = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading pending investors...</div>
+        <div className="text-lg">Loading...</div>
       </div>
     );
   }

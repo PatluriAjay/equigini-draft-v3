@@ -16,6 +16,7 @@ export default function InvestorDetailPage({ params }) {
   const [investor, setInvestor] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
     const fetchInvestor = async () => {
@@ -39,7 +40,7 @@ export default function InvestorDetailPage({ params }) {
     if (params.slug) {
       fetchInvestor();
     }
-  }, [params.slug]);
+  }, [params.slug, refreshKey]);
 
   if (loading) {
     return (
@@ -87,6 +88,10 @@ export default function InvestorDetailPage({ params }) {
 
   const { backLink, backText } = getBreadcrumbLinks();
 
+  const handleStatusChange = () => {
+    setRefreshKey(prev => prev + 1);
+  };
+
   return (
     <div className="mx-auto">
       <div>
@@ -99,7 +104,7 @@ export default function InvestorDetailPage({ params }) {
         </nav>
       </div>
       {/* Profile Header and Tabs */}
-      <ProfileHeader investor={investor} source={source} />
+      <ProfileHeader investor={investor} source={source} onStatusChange={handleStatusChange} />
       <ProfileTabs investor={investor} source={source} />
     </div>
   );

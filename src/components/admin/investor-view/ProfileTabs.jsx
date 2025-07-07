@@ -6,22 +6,6 @@ import LegalDocsList from "./LegalDocsList";
 import AccessLogsList from "./AccessLogsList";
 import { getEOIsByInvestor } from "@/services/api";
 
-const sampleDocs = [
-  {
-    type: "nda",
-    deal: "Deal Alpha",
-    version: 1,
-    status: "signed",
-    signed_date: "2024-12-11",
-  },
-  {
-    type: "toc",
-    deal: "Deal Beta",
-    version: 2,
-    status: "pending",
-    signed_date: null,
-  },
-];
 const sampleLogs = [
   {
     document: "NDA - Deal Alpha",
@@ -96,10 +80,10 @@ export default function ProfileTabs({ investor, source = "management" }) {
       <div>
         {active === 0 && <ProfileDetails investor={investor} />}
         {source !== "approval" && active === 1 && (
-          <EOIList eois={eois} loading={loading} />
+          <EOIList eois={investor?.eoi_submissions || []} loading={loading} />
         )}
         {source !== "approval" && active === 2 && (
-          <LegalDocsList docs={sampleDocs} />
+          <LegalDocsList ndaAgreements={investor?.nda_agreements || []} />
         )}
         {source !== "approval" && active === 3 && (
           <AccessLogsList logs={sampleLogs} />

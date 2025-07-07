@@ -1,21 +1,25 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createBlog } from "@/services/api";
+import { createBlog, saveBlogDraft } from "@/services/api";
 import ModalMessage from "@/components/investor/ModalMessage";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
+import Link from "next/link";
 
 export default function CreateBlogPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
+    meta_title: "",
+    meta_description: "",
   });
   const [wordDocument, setWordDocument] = useState(null);
   const [featuredImage, setFeaturedImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
   const [modalMessage, setModalMessage] = useState({ show: false, type: "success", message: "" });
 
   const handleInputChange = (e) => {
@@ -89,6 +93,8 @@ export default function CreateBlogPage() {
       const formDataToSend = new FormData();
       formDataToSend.append("title", formData.title);
       formDataToSend.append("slug", formData.slug);
+      formDataToSend.append("meta_title", formData.meta_title);
+      formDataToSend.append("meta_description", formData.meta_description);
       formDataToSend.append("word_document", wordDocument);
       formDataToSend.append("created_by", "1");
 
@@ -127,8 +133,80 @@ export default function CreateBlogPage() {
     }
   };
 
+  const handleSaveDraft = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.title || !formData.slug) {
+      setModalMessage({
+        show: true,
+        type: "error",
+        message: "Please fill in title and slug to save as draft"
+      });
+      return;
+    }
+
+    try {
+      setSavingDraft(true);
+
+      const formDataToSend = new FormData();
+      formDataToSend.append("title", formData.title);
+      formDataToSend.append("slug", formData.slug);
+      formDataToSend.append("meta_title", formData.meta_title);
+      formDataToSend.append("meta_description", formData.meta_description);
+      formDataToSend.append("created_by", "1");
+
+      // Add word document if available (optional for draft)
+      if (wordDocument) {
+        formDataToSend.append("word_document", wordDocument);
+      }
+
+      // Add featured image if available (optional for draft)
+      if (featuredImage) {
+        formDataToSend.append("featured_image", featuredImage);
+      }
+
+      const response = await saveBlogDraft(formDataToSend);
+      
+      if (response.status === "S") {
+        setModalMessage({
+          show: true,
+          type: "success",
+          message: "Blog draft saved successfully!"
+        });
+        // Redirect after a short delay to show the success message
+        setTimeout(() => {
+          router.push("/admin/blogs");
+        }, 1500);
+      } else {
+        setModalMessage({
+          show: true,
+          type: "error",
+          message: response.error_info || "Failed to save blog draft"
+        });
+      }
+    } catch (err) {
+      console.error("Error saving blog draft:", err);
+      setModalMessage({
+        show: true,
+        type: "error",
+        message: err.message || "Failed to save blog draft"
+      });
+    } finally {
+      setSavingDraft(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-5">
+      <div>
+        <nav className="flex items-center space-x-2 text-gray-600 mb-4">
+          <Link href="/admin" className="hover:underline">Home</Link>
+          <span className="text-gray-400">{">"}</span>
+          <Link href="/admin/blogs" className="hover:underline">Blog Management</Link>
+          <span className="text-gray-400">{">"}</span>
+          <span className="font-semibold">Create Blog</span>
+        </nav>
+      </div>
       <div className="flex justify-between items-center gap-2">
         <h1 className="heading-main">Create Blog</h1>
       </div>
@@ -236,6 +314,38 @@ export default function CreateBlogPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Meta Title *
+              </label>
+              <input
+                type="text"
+                name="meta_title"
+                value={formData.meta_title}
+                onChange={handleInputChange}
+                className="form-input w-full"
+                placeholder="Enter meta title"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Meta Description *
+              </label>
+              <textarea
+                name="meta_description"
+                value={formData.meta_description}
+                onChange={handleInputChange}
+                className="form-input w-full"
+                placeholder="Enter meta description"
+                rows="3"
+                required
+              ></textarea>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
               <label className="form-label">
                 Word Document *
               </label>
@@ -257,9 +367,36 @@ export default function CreateBlogPage() {
                   required
                 />
               </div>
+              <div className="flex ">
               <p className="text-sm text-gray-500 mt-1">
-                Upload a Word document (.doc or .docx)
+                Upload a Word document (.doc or .docx) 
               </p>
+              </div>
+              <div className="mt-2 space-y-2">
+                <p className="text-sm text-gray-600 font-medium">Download Templates:</p>
+                <div className="flex flex-col gap-2">
+                  <a
+                    href="/sampleblogfiles/template_01.docx"
+                    download="Blog_Template_01.docx"
+                    className="inline-flex items-center text-sm text-primarycolor hover:text-primarycolor/80 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download Blog Template 01
+                  </a>
+                  <a
+                    href="/sampleblogfiles/template_02.docx"
+                    download="Blog_Template_02.docx"
+                    className="inline-flex items-center text-sm text-primarycolor hover:text-primarycolor/80 transition-colors"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Download Blog Template 02
+                  </a>
+                </div>
+              </div>
             </div>
 
 
@@ -267,16 +404,25 @@ export default function CreateBlogPage() {
 
           <div className="flex gap-4 pt-4 justify-center items-center">
             <button
+              type="button"
+              onClick={handleSaveDraft}
+              disabled={savingDraft || !formData.title || !formData.slug}
+              className="btn-secondary"
+            >
+              {savingDraft ? "Saving Draft..." : "Save as Draft"}
+            </button>
+            <button
               type="submit"
               disabled={loading}
               className="btn-primary"
             >
               {loading ? "Creating..." : "Create"}
             </button>
+          
             <button
               type="button"
               onClick={() => router.push("/admin/blogs")}
-              className="btn-secondary"
+              className="btn-tertiary"
             >
               Cancel
             </button>

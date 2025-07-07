@@ -4,7 +4,8 @@ import InvestorStats from "./InvestorStats";
 import InvestorFilters from "./InvestorFilters";
 import InvestorTable from "./InvestorTable";
 import Pagination from "@/components/common/Pagination";
-import { getApprovedInvestors } from "@/services/api";
+import ModalMessage from "@/components/investor/ModalMessage";
+import { getApprovedInvestors, toggleInvestorActivation, deleteInvestor } from "@/services/api";
 
 export default function InvestorListPage() {
   const [investors, setInvestors] = useState([]);
@@ -17,6 +18,16 @@ export default function InvestorListPage() {
   
   // Search state
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Modal states
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [modalType, setModalType] = useState("success");
+  const [showActivationModal, setShowActivationModal] = useState(false);
+  const [activationData, setActivationData] = useState({ investorId: null, isActive: false, investorName: "" });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteData, setDeleteData] = useState({ investorId: null, investorName: "" });
+  const [processingAction, setProcessingAction] = useState(false);
 
   useEffect(() => {
     const fetchApprovedInvestors = async () => {
@@ -74,6 +85,80 @@ export default function InvestorListPage() {
   const onReject = () => {};
   const onDeactivate = () => {};
 
+  // Handle toggle activation
+  const handleToggleActivation = (investorId, isActive) => {
+    const investor = investors.find(inv => inv._id === investorId);
+    if (investor) {
+      setActivationData({
+        investorId,
+        isActive,
+        investorName: investor.full_name || 'this investor'
+      });
+      setShowActivationModal(true);
+    }
+  };
+
+  const confirmActivation = async () => {
+    try {
+      setProcessingAction(true);
+      await toggleInvestorActivation(activationData.investorId, activationData.isActive);
+      
+      const actionText = activationData.isActive ? "activated" : "deactivated";
+      setModalMessage(`${activationData.investorName} has been ${actionText} successfully!`);
+      setModalType("success");
+      setShowModal(true);
+      setShowActivationModal(false);
+      
+      // Refresh the investors list
+      const response = await getApprovedInvestors();
+      if (response.result_info) {
+        setInvestors(response.result_info);
+      }
+    } catch (error) {
+      setModalMessage(error.message || "Failed to toggle investor activation");
+      setModalType("error");
+      setShowModal(true);
+    } finally {
+      setProcessingAction(false);
+    }
+  };
+
+  // Handle delete investor
+  const handleDeleteInvestor = (investorId) => {
+    const investor = investors.find(inv => inv._id === investorId);
+    if (investor) {
+      setDeleteData({
+        investorId,
+        investorName: investor.full_name || 'this investor'
+      });
+      setShowDeleteModal(true);
+    }
+  };
+
+  const confirmDelete = async () => {
+    try {
+      setProcessingAction(true);
+      await deleteInvestor(deleteData.investorId);
+      
+      setModalMessage(`${deleteData.investorName} has been deleted successfully!`);
+      setModalType("success");
+      setShowModal(true);
+      setShowDeleteModal(false);
+      
+      // Refresh the investors list
+      const response = await getApprovedInvestors();
+      if (response.result_info) {
+        setInvestors(response.result_info);
+      }
+    } catch (error) {
+      setModalMessage(error.message || "Failed to delete investor");
+      setModalType("error");
+      setShowModal(true);
+    } finally {
+      setProcessingAction(false);
+    }
+  };
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
   };
@@ -87,21 +172,21 @@ export default function InvestorListPage() {
     setSearchTerm(e.target.value);
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg">Loading approved investors...</div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center h-64">
+  //       <div className="text-lg">Loading...</div>
+  //     </div>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="text-lg text-red-600">Error: {error}</div>
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="flex justify-center items-center h-64">
+  //       <div className="text-lg text-red-600">Error: {error}</div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className=" ">
@@ -133,7 +218,9 @@ export default function InvestorListPage() {
             investors={paginatedInvestors} 
             onApprove={onApprove} 
             onReject={onReject} 
-            onDeactivate={onDeactivate} 
+            onDeactivate={onDeactivate}
+            onToggleActivation={handleToggleActivation}
+            onDeleteInvestor={handleDeleteInvestor}
           />
         </div>
       </div>
@@ -150,6 +237,36 @@ export default function InvestorListPage() {
           showPageInfo={true}
         />
       </div>
+
+      {/* Success/Error Message Modal */}
+      <ModalMessage
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        type={modalType}
+        message={modalMessage}
+      />
+
+      {/* Activation Confirmation Modal */}
+      <ModalMessage
+        show={showActivationModal}
+        onClose={() => setShowActivationModal(false)}
+        type="confirm"
+        message={`Are you sure you want to ${activationData.isActive ? "activate" : "deactivate"} ${activationData.investorName}? This action will ${activationData.isActive ? "allow" : "prevent"} the investor from accessing the platform.`}
+        onConfirm={confirmActivation}
+        confirmText={activationData.isActive ? "Activate" : "Deactivate"}
+        showCancel={true}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <ModalMessage
+        show={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        type="confirm"
+        message={`Are you sure you want to delete?`}
+        onConfirm={confirmDelete}
+        confirmText="Delete"
+        showCancel={true}
+      />
     </div>
   );
 }

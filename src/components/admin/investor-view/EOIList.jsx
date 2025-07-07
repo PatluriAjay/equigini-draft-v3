@@ -18,10 +18,16 @@ export default function EOIList({ eois = [], loading = false }) {
     });
   };
 
+  const handleViewPDF = (pdfPath) => {
+    if (pdfPath) {
+      window.open("http://localhost:4000/" + pdfPath, "_blank");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-32">
-        <div className="text-lg">Loading EOIs...</div>
+        <div className="text-lg">Loading...</div>
       </div>
     );
   }
@@ -33,16 +39,31 @@ export default function EOIList({ eois = [], loading = false }) {
           <tr>
             <th className="table-th">Deal</th>
             <th className="table-th">EOI Date</th>
+            <th className="table-th">Action</th>
           </tr>
         </thead>
         <tbody>
           {eois.length === 0 && (
-            <tr><td colSpan={2} className="table-empty">No EOIs found.</td></tr>
+            <tr><td colSpan={3} className="table-empty">No EOIs found.</td></tr>
           )}
           {eois.map((eoi, idx) => (
-            <tr key={idx} className="table-row">
+            <tr key={eoi._id || idx} className="table-row">
               <td className="table-td">{eoi.deal_title}</td>
               <td className="table-td">{formatDate(eoi.createdAt)}</td>
+              <td className="table-td">
+                {eoi.pdf_path && (
+                  <button 
+                    className="text-primarycolor hover:text-blue-700 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewPDF(eoi.pdf_path);
+                    }}
+                    title="View PDF"
+                  >
+                    <IoMdEye size={20} />
+                  </button>
+                )}
+              </td>
             </tr>
           ))}
         </tbody>

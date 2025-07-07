@@ -3,7 +3,7 @@ import { FiEdit2, FiArchive } from "react-icons/fi";
 import { FaEye, FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
-export default function DealTable({ deals, onEdit, onArchive, onStatusChange }) {
+export default function DealTable({ deals, onEdit, onDelete, onStatusChange }) {
 
   return (
     <div className="overflow-x-auto w-full max-w-xs sm:max-w-sm md:max-w-full">
@@ -36,8 +36,12 @@ export default function DealTable({ deals, onEdit, onArchive, onStatusChange }) 
                 <span className={` `}>{deal.deal_priority || "-"}</span>
               </td>
               <td className="table-td flex gap-3 items-center">
-                <button className="" title="Edit" onClick={() => onEdit(deal._id)}><FaEdit size={20} color="" /></button>
-                <button className="" title="Delete" onClick={() => onArchive(deal._id)}><MdDelete  size={20} color="" /></button>
+                <button className=" transition-colors" title="Edit" onClick={() => onEdit(deal._id)}>
+                  <FaEdit size={20} />
+                </button>
+                <button className=" transition-colors" title="Delete" onClick={() => onDelete(deal._id)}>
+                  <MdDelete size={20} />
+                </button>
               </td>
             </tr>
           ))}

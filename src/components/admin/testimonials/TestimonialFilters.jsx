@@ -7,7 +7,7 @@ export default function TestimonialFilters({ searchValue = "", onSearch }) {
       <div className="flex-shrink-0">
         <input
           type="text"
-          placeholder="Search testimonials..."
+          placeholder="Search..."
           className="search-input w-72"
           value={searchValue}
           onChange={(e) => onSearch && onSearch(e.target.value)}

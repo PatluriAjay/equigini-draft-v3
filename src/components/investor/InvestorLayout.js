@@ -2,20 +2,25 @@
 import InvestorNavbar from "@/components/investor/Navbar";
 import InvestorFooterMenu from "@/components/investor/InvestorFooterMenu";
 import InvestorFooter from "@/components/investor/InvestorFooter";
+import PageLoader from "@/components/loading-components/PageLoader";
+import { usePageLoader } from "@/utils/usePageLoader";
 
 export default function InvestorLayout({ children }) {
+  const { isLoading } = usePageLoader();
+
   /**
    * @param {{ children: React.ReactNode }} props
    */
-  // const navbarPadding = "pt-[90px]";
 
   return (
     <div className="min-h-screen bg-bodybg flex flex-col">
+      {/* Page Loader */}
+      <PageLoader isLoading={isLoading} />
+      
       {/* Navbar fixed at the top */}
       <div className="fixed top-0 left-0 right-0 z-50">
         <InvestorNavbar />
       </div>
-      {/* Main content area with scroll, padding for navbar/footer */}
       <div
         className={`flex-1 pt-[14vh] overflow-y-auto container mx-auto px-6 `}
         style={{ minHeight: 0 }}
