@@ -3,7 +3,7 @@ import ProfileHeader from "@/components/admin/investor-view/ProfileHeader";
 import ProfileTabs from "@/components/admin/investor-view/ProfileTabs";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { getInvestorById } from "@/services/api";
 
 // Function to validate MongoDB ObjectId
@@ -11,7 +11,7 @@ const isValidObjectId = (id) => {
   return /^[0-9a-fA-F]{24}$/.test(id);
 };
 
-export default function InvestorDetailPage({ params }) {
+function InvestorDetailContent({ params }) {
   const searchParams = useSearchParams();
   const [investor, setInvestor] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -107,5 +107,13 @@ export default function InvestorDetailPage({ params }) {
       <ProfileHeader investor={investor} source={source} onStatusChange={handleStatusChange} />
       <ProfileTabs investor={investor} source={source} />
     </div>
+  );
+}
+
+export default function InvestorDetailPage({ params }) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <InvestorDetailContent params={params} />
+    </Suspense>
   );
 }

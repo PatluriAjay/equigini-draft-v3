@@ -3,6 +3,7 @@ import { MdFileDownload } from "react-icons/md";
 import { DealIconMap } from "./dealIcons";
 import { deals as dealsData } from "@/components/investor/deals/deals";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HorizontalScrollDeals({ maxDeals, layout = "default" }) {
   const displayDeals = maxDeals ? dealsData.slice(0, maxDeals) : dealsData;
@@ -19,9 +20,11 @@ export default function HorizontalScrollDeals({ maxDeals, layout = "default" }) 
               {/* Deal Image */}
               <div className="w-full h-40 mb-4 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center">
                 {deal.imageUrl ? (
-                  <img
+                  <Image
                     src={deal.imageUrl}
                     alt={deal.name}
+                    width={320}
+                    height={160}
                     className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
                   />
                 ) : (

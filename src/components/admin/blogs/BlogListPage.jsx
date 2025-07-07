@@ -215,7 +215,7 @@ export default function BlogListPage() {
               Confirm Delete
             </div>
             <div className="text-sm text-secondary3 mb-4">
-              Are you sure you want to delete "{deleteConfirmation.blogTitle}"? This action cannot be undone.
+              Are you sure you want to delete &ldquo;{deleteConfirmation.blogTitle}&rdquo;? This action cannot be undone.
             </div>
             <div className="flex gap-3">
               <button

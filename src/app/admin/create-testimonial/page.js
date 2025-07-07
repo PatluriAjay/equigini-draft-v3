@@ -6,6 +6,7 @@ import ModalMessage from "@/components/investor/ModalMessage";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CreateTestimonialPage() {
   const router = useRouter();
@@ -128,9 +129,11 @@ export default function CreateTestimonialPage() {
             <div className="relative">
               <div className="w-[150px] h-[150px] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden">
                 {imagePreview ? (
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Preview"
+                    width={150}
+                    height={150}
                     className="w-full h-full object-cover"
                   />
                 ) : (

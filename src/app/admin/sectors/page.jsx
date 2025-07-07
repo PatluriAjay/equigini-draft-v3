@@ -263,7 +263,7 @@ export default function SectorManagementPage() {
           <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative text-center">
             <h2 className="heading-main mb-4 text-red-600">Delete Sector</h2>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{deletingSector.name}"? This action cannot be undone.
+              Are you sure you want to delete &ldquo;{deletingSector.name}&rdquo;? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button

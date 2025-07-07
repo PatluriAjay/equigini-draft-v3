@@ -300,7 +300,7 @@ export default function TicketSizeManagementPage() {
           <div className="bg-white rounded-lg shadow-lg w-full max-w-sm p-6 relative text-center">
             <h2 className="heading-main mb-4 text-red-600">Delete Ticket Size</h2>
             <p className="text-gray-600 mb-6">
-              Are you sure you want to delete "{deletingRange.ticket_min} – {deletingRange.ticket_max}"? This action cannot be undone.
+              Are you sure you want to delete &ldquo;{deletingRange.ticket_min} – {deletingRange.ticket_max}&rdquo;? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button

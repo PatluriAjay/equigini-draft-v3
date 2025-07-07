@@ -1,5 +1,10 @@
 import AdminLayout from "@/components/admin/AdminLayout";
+import { Suspense } from "react";
 
 export default function AdminRootLayout({ children }) {
-  return <AdminLayout>{children}</AdminLayout>;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminLayout>{children}</AdminLayout>
+    </Suspense>
+  );
 }

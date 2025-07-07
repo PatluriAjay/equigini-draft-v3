@@ -1,4 +1,5 @@
 import { getBlogBySlug } from "@/services/api";
+import Image from "next/image";
 
 export async function generateMetadata({ params }) {
   try {
@@ -46,7 +47,7 @@ export default async function BlogPage({ params }) {
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">Blog Not Found</h1>
-            <p className="text-gray-600 mb-4">The blog you're looking for doesn't exist or has been removed.</p>
+            <p className="text-gray-600 mb-4">The blog you&apos;re looking for doesn&apos;t exist or has been removed.</p>
             <a 
               href="/" 
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -91,9 +92,11 @@ export default async function BlogPage({ params }) {
           {/* Featured Image */}
           {blog.featured_image && (
             <div className="mb-8">
-              <img
+              <Image
                 src={`http://localhost:4000/${blog.featured_image.path.replace(/\\/g, "/")}`}
                 alt={blog.title}
+                width={800}
+                height={400}
                 className="w-full h-64 md:h-96 object-cover rounded-lg shadow-lg"
               />
             </div>

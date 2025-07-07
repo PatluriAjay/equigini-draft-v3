@@ -1,6 +1,10 @@
-import React from 'react';
+import React, { Suspense } from 'react';
 import UnverifiedInvestorLayout from "@/components/unverified-investor/UnverifiedInvestorLayout";
 
 export default function UnverifiedInvestorRootLayout({ children }) {
-  return <UnverifiedInvestorLayout>{children}</UnverifiedInvestorLayout>;
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <UnverifiedInvestorLayout>{children}</UnverifiedInvestorLayout>
+    </Suspense>
+  );
 } 

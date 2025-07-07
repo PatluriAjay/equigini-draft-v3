@@ -6,6 +6,7 @@ import ModalMessage from "@/components/investor/ModalMessage";
 import { FaEdit } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function CreateBlogPage() {
   const router = useRouter();
@@ -218,9 +219,11 @@ export default function CreateBlogPage() {
             <div className="relative">
               <div className="w-[200px] h-[100px] border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden ">
                 {imagePreview ? (
-                  <img
+                  <Image
                     src={imagePreview}
                     alt="Featured Image Preview"
+                    width={200}
+                    height={100}
                     className="w-full h-full object-fill"
                   />
                 ) : (

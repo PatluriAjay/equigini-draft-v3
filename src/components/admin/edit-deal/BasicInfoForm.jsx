@@ -3,6 +3,7 @@ import Select from "react-select";
 import { getAllSectors, getAllStages, getAllTicketSizes, getAllStatuses } from "@/services/api";
 import { FaEye, FaEdit, FaTrash, FaImage } from "react-icons/fa";
 import { MdAdd, MdDelete } from "react-icons/md";
+import Image from "next/image";
 
 // Collateral Documents Upload Component
 function CollateralDocumentsUpload({ existingDocuments, onDocumentChange }) {
@@ -514,9 +515,11 @@ export default function BasicInfoForm({ values = {}, onChange }) {
             <h3 className="subheading mb-2">Deal Image</h3>
             {values.image ? (
               <div className={thumbBox}>
-                <img
+                <Image
                   src={typeof values.image === 'object' && values.image.path ? "http://localhost:4000/" + values.image.path.replace(/\\/g, "/") : (values.image.file ? URL.createObjectURL(values.image.file) : URL.createObjectURL(values.image))}
                   alt={values.image.originalname || values.image.name}
+                  width={200}
+                  height={128}
                   className="object-contain h-32 w-full rounded"
                 />
                 <div className="flex justify-center mt-2">
@@ -544,9 +547,11 @@ export default function BasicInfoForm({ values = {}, onChange }) {
             <h3 className="subheading mb-2">Deal Icon</h3>
             {values.deal_icon ? (
               <div className={thumbBox}>
-                <img
+                <Image
                   src={typeof values.deal_icon === 'object' && values.deal_icon.path ? "http://localhost:4000/" + values.deal_icon.path.replace(/\\/g, "/") : (values.deal_icon.file ? URL.createObjectURL(values.deal_icon.file) : URL.createObjectURL(values.deal_icon))}
                   alt={values.deal_icon.originalname || values.deal_icon.name}
+                  width={200}
+                  height={128}
                   className="object-contain h-32 w-full rounded"
                 />
                 <div className="flex justify-center mt-2">

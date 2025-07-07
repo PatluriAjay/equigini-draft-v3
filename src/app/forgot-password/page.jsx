@@ -363,7 +363,7 @@ const ForgotPassword = () => {
       <div>
         <label className="form-label">Enter 6-digit OTP</label>
         <p className="text-secondary3 text-sm mb-3">
-          We've sent a 6-digit code to {formData.email}
+          We&apos;ve sent a 6-digit code to {formData.email}
         </p>
         <div className="flex gap-2 justify-center">
           {formData.otp.map((digit, index) => (

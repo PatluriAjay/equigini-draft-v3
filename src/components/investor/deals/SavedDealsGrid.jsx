@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react"; 
+import { useState, useEffect, useMemo, useCallback } from "react"; 
 import { FaLock, FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
 import { DealIconMap } from "./dealIcons";
@@ -7,6 +7,7 @@ import Loader from "../../common/Loader";
 import { getAllDeals, getInvestorWatchlist, getAllEOIs, toggleDealInWatchlist } from "../../../services/api";
 import Link from "next/link";
 import { GoBookmarkFill } from 'react-icons/go';
+import Image from "next/image";
 
 export default function SavedDealsGrid({ 
   maxDeals, 
@@ -92,7 +93,7 @@ export default function SavedDealsGrid({
   };
 
   // Transform backend data to frontend format
-  const transformDealData = (deal) => {
+  const transformDealData = useCallback((deal) => {
     // Helper function to construct image URL
     const getImageUrl = (imageData) => {
       if (!imageData || !imageData.path) return null;
@@ -129,7 +130,7 @@ export default function SavedDealsGrid({
       statusId: deal.status,
       ticketSizeId: deal.ticket_size_range,
     };
-  };
+  }, [eoiStatus]);
 
   // Apply filters to deals
   const filteredDeals = useMemo(() => {
@@ -183,7 +184,7 @@ export default function SavedDealsGrid({
     }
     
     return filtered;
-  }, [deals, filters, searchTerm, dropdownOptions]);
+  }, [deals, filters, searchTerm, dropdownOptions, transformDealData]);
 
   const displayDeals = maxDeals ? filteredDeals.slice(0, maxDeals) : filteredDeals;
   const gridCols = layout === "compact" ? "lg:grid-cols-3" : "lg:grid-cols-4";
@@ -293,15 +294,19 @@ export default function SavedDealsGrid({
                 {/* Deal Image */}
                 <div className="w-full mb-4 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center relative">
                   {deal.imageUrl ? (
-                    <img
+                    <Image
                       src={deal.imageUrl}
                       alt={deal.name}
+                      width={400}
+                      height={180}
                       className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
                     />
                   ) : (
-                    <img
+                    <Image
                       src="https://placehold.co/400x180?text=No+Image"
                       alt="No Image"
+                      width={400}
+                      height={180}
                       className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
                     />
                   )}
@@ -328,10 +333,11 @@ export default function SavedDealsGrid({
                   <div className="card-icon-div ">
                     {/* First try to use custom deal icon from backend, then fallback to sector-based icon */}
                     {deal.dealIconUrl ? (
-                      <img 
+                      <Image 
                         src={deal.dealIconUrl} 
                         alt={`${deal.sector} icon`}
-                        className="w-6 h-6 object-contain"
+                        width={24}
+                        height={24}
                       />
                     ) : (
                       DealIconMap[deal.sector] || DealIconMap[deal.icon] || (

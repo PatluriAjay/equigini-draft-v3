@@ -1,4 +1,5 @@
 import { getAllBlogs } from "@/services/api";
+import Image from "next/image";
 
 export const metadata = {
   title: "Blogs | Equigini",
@@ -64,9 +65,11 @@ export default async function BlogsPage() {
                   {/* Featured Image */}
                   {blog.featured_image && (
                     <div className="aspect-video overflow-hidden">
-                      <img
+                      <Image
                         src={`http://localhost:4000/${blog.featured_image.path.replace(/\\/g, "/")}`}
                         alt={blog.title}
+                        width={400}
+                        height={225}
                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                       />
                     </div>

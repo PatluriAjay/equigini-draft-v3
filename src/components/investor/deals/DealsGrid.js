@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useMemo } from "react"; 
+import { useState, useEffect, useMemo, useCallback } from "react"; 
 import { FaLock, FaRegBookmark, FaBookmark } from "react-icons/fa";
 import { MdFileDownload } from "react-icons/md";
 import { GoBookmark, GoBookmarkFill } from 'react-icons/go';
@@ -8,6 +8,7 @@ import { getAllDeals, getAllEOIs, toggleDealInWatchlist, isDealInWatchlist } fro
 import Link from "next/link";
 import Loader from "../../common/Loader";
 import { usePathname } from "next/navigation";
+import Image from "next/image";
 
 export default function DealsGrid({ 
   maxDeals, 
@@ -48,11 +49,7 @@ export default function DealsGrid({
   };
 
   // Fetch deals and EOI status on component mount
-  useEffect(() => {
-    fetchDealsAndStatus();
-  }, []);
-
-  const fetchDealsAndStatus = async () => {
+  const fetchDealsAndStatus = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -120,7 +117,11 @@ export default function DealsGrid({
     } finally {
       setLoading(false);
     }
-  };
+  }, [isDashboardPage]);
+
+  useEffect(() => {
+    fetchDealsAndStatus();
+  }, [fetchDealsAndStatus]);
 
   const handleBookmarkToggle = async (dealId, e) => {
     e.stopPropagation(); // Prevent card click
@@ -147,7 +148,7 @@ export default function DealsGrid({
   };
 
   // Transform backend data to frontend format
-  const transformDealData = (deal) => {
+  const transformDealData = useCallback((deal) => {
     // Helper function to construct image URL
     const getImageUrl = (imageData) => {
       if (!imageData || !imageData.path) return null;
@@ -184,7 +185,7 @@ export default function DealsGrid({
       statusId: deal.status,
       ticketSizeId: deal.ticket_size_range,
     };
-  };
+  }, [eoiStatus]);
 
   // Apply filters to deals
   const filteredDeals = useMemo(() => {
@@ -246,7 +247,7 @@ export default function DealsGrid({
     }
     
     return filtered;
-  }, [deals, filters, searchTerm, eoiStatus, dropdownOptions]);
+  }, [deals, filters, searchTerm, dropdownOptions, transformDealData]);
 
   const displayDeals = maxDeals ? filteredDeals.slice(0, maxDeals) : filteredDeals;
   const gridCols = layout === "compact" ? "lg:grid-cols-3" : "lg:grid-cols-4";
@@ -334,9 +335,11 @@ export default function DealsGrid({
               <div className="cursor-pointer">
                 {/* Deal Image */}
                 <div className="w-full mb-4 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center relative">
-                  <img
+                  <Image
                     src={deal.imageUrl || "https://placehold.co/400x180?text=No+Image"}
                     alt={deal.name}
+                    width={400}
+                    height={180}
                     className="object-cover w-full h-full hover:scale-105 transition-transform duration-200"
                   />
                   {/* Bookmark Button - Only show on dashboard page */}
@@ -366,9 +369,11 @@ export default function DealsGrid({
                   <div className="card-icon-div ">
                     {/* First try to use custom deal icon from backend, then fallback to sector-based icon */}
                     {deal.dealIconUrl ? (
-                      <img 
+                      <Image 
                         src={deal.dealIconUrl} 
                         alt={`${deal.sector} icon`}
+                        width={24}
+                        height={24}
                         className="w-6 h-6 object-contain"
                       />
                     ) : (

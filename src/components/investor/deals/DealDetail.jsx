@@ -3,6 +3,7 @@ import { MdFileDownload } from 'react-icons/md';
 import { FaEye } from 'react-icons/fa';
 import { GoBookmark, GoBookmarkFill } from 'react-icons/go';
 import Link from "next/link";
+import Image from "next/image";
 import EOIModal from "../EOIModal";
 import ModalMessage from "../ModalMessage";
 import NDAModal from "../NDAModal";
@@ -276,9 +277,11 @@ export default function DealDetail({ dealSlug }) {
       {/* Top Banner Image with Title Overlay */}
       <div className="w-full h-48 relative overflow-hidden">
         {transformedDeal.imageUrl ? (
-          <img 
+          <Image 
             src={transformedDeal.imageUrl}
             alt={transformedDeal.title}
+            width={800}
+            height={192}
             className="w-full h-full object-cover"
           />
         ) : (
