@@ -1,0 +1,2 @@
+Build this component using existing global styles and Tailwind utility classes. If any new style (color, spacing, font, etc.) is required and not already defined, add it either to the tailwind.config.js or globals.css so it can be reused project-wide. Use semantic HTML and ensure responsiveness across breakpoints. Keep the look professional and elegant, consistent with the design system.
+Also ensure the component is integration-ready — structure it for real data and API binding (not just visual mockups).
